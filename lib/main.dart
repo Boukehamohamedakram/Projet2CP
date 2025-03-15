@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
  // Import the settings page
-import 'pages/page1.dart'; 
+ 
+import 'home/home1.dart'; 
+
 
 
 void main() {
@@ -29,7 +31,7 @@ class MainPage extends StatelessWidget {
           onPressed: () {
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) =>  SettingsPage()), // Navigate to SettingsPage
+              MaterialPageRoute(builder: (context) =>  QuizHomePage()), // Navigate to SettingsPage
             );
           },
           child: Text('Go to Settings'),
