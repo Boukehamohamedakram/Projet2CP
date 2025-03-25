@@ -12,7 +12,13 @@ class Quiz(models.Model):
     )
     title = models.CharField(max_length=255)
     description = models.TextField()
-    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='Quiz')
+    teacher = models.ForeignKey(User, on_delete=models.CASCADE, related_name='quizzes')
+    assigned_students = models.ManyToManyField(
+        User, 
+        related_name='assigned_quizzes',
+        limit_choices_to={'role': 'student'},
+        blank=True  # Allow assigning students later
+    )
     time_limit = models.IntegerField(help_text="Time limit in minutes")
     is_published = models.BooleanField(default=False)
     start_time = models.DateTimeField(null=True, blank=True)
@@ -50,8 +56,19 @@ class StudentAnswer(models.Model):
     text_answer = models.TextField(blank=True, null=True)
     submitted_at = models.DateTimeField(auto_now_add=True)
 
+    def is_correct(self):
+        if self.question.question_type == 'mcq' and self.selected_option:
+            return self.selected_option.is_correct
+        return None  # No auto-grading for text answers
+
 class Result(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='results')
     student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='results')
-    score = models.FloatField()
+    score = models.FloatField(default=0)  # Default to 0 until graded
     completed_at = models.DateTimeField(auto_now_add=True)
+
+    def calculate_score(self):
+        correct_answers = self.student.answers.filter(question__quiz=self.quiz, selected_option__is_correct=True).count()
+        total_questions = self.quiz.questions.count()
+        self.score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+        self.save()

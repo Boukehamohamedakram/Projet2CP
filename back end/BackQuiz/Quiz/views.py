@@ -9,6 +9,17 @@ class QuizListCreateView(generics.ListCreateAPIView):
     serializer_class = QuizSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacherOrReadOnly]  # Students can view, teachers can create/edit
 
+    def perform_create(self, serializer):
+        quiz = serializer.save(teacher=self.request.user)
+        quiz.assigned_students.set(serializer.validated_data.get('assigned_students', []))
+
+class AssignedQuizListView(generics.ListAPIView):
+    serializer_class = QuizSerializer
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
+
+    def get_queryset(self):
+        return Quiz.objects.filter(assigned_students=self.request.user)
+
 class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
@@ -47,6 +58,18 @@ class StudentAnswerListCreateView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return StudentAnswer.objects.filter(student=self.request.user)  # Students only see their own answers
+
+    def perform_create(self, serializer):
+        answer = serializer.save(student=self.request.user)
+        # Auto-grade MCQ & TF questions
+        if answer.question.question_type in ['mcq', 'tf']:
+            if answer.selected_option and answer.selected_option.is_correct:
+                score = 1  # Correct answer
+            else:
+                score = 0  # Incorrect answer
+            result, _ = Result.objects.get_or_create(quiz=answer.question.quiz, student=self.request.user)
+            result.score += score
+            result.save()
 
 class StudentAnswerDetailView(generics.RetrieveAPIView):
     queryset = StudentAnswer.objects.all()

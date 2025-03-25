@@ -1,19 +1,14 @@
 from django.contrib import admin
 from django.urls import path, include
-from rest_framework_simplejwt.views import (
-    TokenObtainPairView,
-    TokenRefreshView,
-)
+from rest_framework.authtoken.views import obtain_auth_token
 
 urlpatterns = [
-    path('admin/', admin.site.urls),  # Django admin panel
-
-    # API endpoints for each app
-    path('api/users/', include('users.urls')),  
-    path('api/quizzes/', include('Quiz.urls')),
-    path('api/notifications/', include('notifications.urls')),
-
-    # JWT Authentication endpoints
-    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),  # Login
-    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),  # Refresh token
+    path('admin/', admin.site.urls),
+    path('api/users/', include('users.urls')),
+    path('api/Quiz/', include('Quiz.urls')),
+    path('api/', include('notifications.urls')), 
+     
+     path('api-auth/', include('rest_framework.urls')),  # Adds Login button in Browsable API
+    path('api/users/login/', obtain_auth_token, name='api_token_auth'),  # Login to get token
 ]
+

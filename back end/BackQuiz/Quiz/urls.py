@@ -1,6 +1,6 @@
 from django.urls import path
 from .views import (
-    QuizListCreateView, QuizDetailView,
+    QuizListCreateView, QuizDetailView, AssignedQuizListView,
     QuestionListCreateView, QuestionDetailView,
     OptionListCreateView, OptionDetailView,
     StudentAnswerListCreateView, StudentAnswerDetailView,
@@ -11,6 +11,7 @@ urlpatterns = [
     # Quiz URLs
     path('quizzes/', QuizListCreateView.as_view(), name='quiz-list-create'),
     path('quizzes/<int:pk>/', QuizDetailView.as_view(), name='quiz-detail'),
+    path('quizzes/assigned/', AssignedQuizListView.as_view(), name='assigned-quizzes'),
 
     # Question URLs
     path('questions/', QuestionListCreateView.as_view(), name='question-list-create'),
