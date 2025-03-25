@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'page2.dart';
-import 'page3.dart';
-import 'page4.dart';
+import 'class/PersonalInfoCard.dart';
 
 class SettingsPage extends StatefulWidget {
   @override
@@ -9,309 +7,208 @@ class SettingsPage extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage> {
-  // Define state variables for the switches
   bool isNotificationEnabled = true;
   bool isSoundEnabled = true;
   bool isVibrateEnabled = true;
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final isSmallScreen = screenWidth < 600;
+
     return Scaffold(
-      backgroundColor: Colors.white, // Set background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Container(
-          margin: EdgeInsets.all(8),
+          margin: EdgeInsets.all(isSmallScreen ? 8 : 12),
           decoration: BoxDecoration(
-            color: Colors.grey[200], // Light gray background for the box
-            borderRadius: BorderRadius.circular(12), // Rounded corners for the box
+            borderRadius: BorderRadius.circular(isSmallScreen ? 12 : 16),
+            border: Border.all(
+              color: Colors.grey[300]!,
+              width: 1,
+            ),
           ),
           child: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context); // Go back to the previous page
-            },
+            icon: Icon(Icons.arrow_back, 
+              color: Colors.black,
+              size: isSmallScreen ? 24 : 30),
+            padding: EdgeInsets.zero,
+            constraints: BoxConstraints(),
+            onPressed: () => Navigator.pop(context),
           ),
         ),
         centerTitle: true,
       ),
-      body: SingleChildScrollView( // Wrap the content in a scrollable view
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            SizedBox(height: 16), // Add space between the back button and the title
-            Text(
-              'Settings',
-              style: TextStyle(
-                fontSize: 32, // Adjusted for font size
-                fontFamily: 'ChalkboardSE', // Assuming you've added the font in your assets
-                fontWeight: FontWeight.w400, // Corrected to use Flutter's FontWeight
-                color: Color(0xFF262626), // Set color to #262626
-              ),
-            ),
-            SizedBox(height: 24), // Add space after the title
-
-            // Personal Info Section
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF31BCE2), // Start color (#31BCE2)
-                    Color(0xFF0664AE), // End color (#0664AE)
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(21.67), // Set border-radius to 21.67px
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Center(
-                    child: Text(
-                      "Personal Info",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'Georgia',
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFFFFFFF),
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 30,
-                        child: Icon(Icons.person, color: Color(0xFF62B2FF), size: 40),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded( // Make the row content flexible to avoid overflow
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Full Name: ', style: TextStyle(fontSize: 16, color: Colors.black)),
-                                  Text('John Smith', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Date of Birth: ', style: TextStyle(fontSize: 16, color: Colors.black)),
-                                  Text('09 / 10 / 1991', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                            SizedBox(height: 8),
-                            Container(
-                              padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(50),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text('Email: ', style: TextStyle(fontSize: 16, color: Colors.black)),
-                                  Text('john@example.com', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.black)),
-                                ],
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => ResetPasswordPage()),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.white),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Text('Change Password', style: TextStyle(color: Colors.white)),
-                      ),
-                      OutlinedButton(
-                        onPressed: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(builder: (context) => SettingsPage2()),
-                          );
-                        },
-                        style: OutlinedButton.styleFrom(
-                          side: BorderSide(color: Colors.white),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(30),
-                          ),
-                        ),
-                        child: Text('Update Profile', style: TextStyle(color: Colors.white)),
-                      ),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 24),
-
-            // Notification Switches Section
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      isNotificationEnabled ? Icons.notifications : Icons.notifications_off,
-                      color: isNotificationEnabled ? Color(0xFF0C71B5) : Color.fromRGBO(12, 113, 181, 0.4),
-                    ),
-                    SizedBox(width: 8),
-                    Text('General Notification', style: TextStyle(fontSize: 18, color: Colors.black87)),
-                  ],
-                ),
-                Transform.scale(
-                  scale: 0.7,
-                  child: Switch(
-                    value: isNotificationEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        isNotificationEnabled = value;
-                      });
-                    },
-                    inactiveThumbColor: Colors.white,
-                    activeTrackColor: Color(0xFF0C71B5),
-                    inactiveTrackColor: Color.fromRGBO(12, 113, 181, 0.4),
-                  ),
-                ),
-              ],
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      isSoundEnabled ? Icons.volume_up : Icons.volume_off,
-                      color: isSoundEnabled ? Color(0xFF0C71B5) : Color.fromRGBO(12, 113, 181, 0.4),
-                    ),
-                    SizedBox(width: 8),
-                    Text('Sound', style: TextStyle(fontSize: 18, color: Colors.black87)),
-                  ],
-                ),
-                Transform.scale(
-                  scale: 0.7,
-                  child: Switch(
-                    value: isSoundEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        isSoundEnabled = value;
-                      });
-                    },
-                    inactiveThumbColor: Colors.white,
-                    activeTrackColor: Color(0xFF0C71B5),
-                    inactiveTrackColor: Color.fromRGBO(12, 113, 181, 0.4),
-                  ),
-                ),
-              ],
-            ),
-
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Row(
-                  children: [
-                    Icon(
-                      Icons.vibration,
-                      color: isVibrateEnabled ? Color(0xFF0C71B5) : Color.fromRGBO(12, 113, 181, 0.4),
-                    ),
-                    SizedBox(width: 8),
-                    Text('Vibration', style: TextStyle(fontSize: 18, color: Colors.black87)),
-                  ],
-                ),
-                Transform.scale(
-                  scale: 0.7,
-                  child: Switch(
-                    value: isVibrateEnabled,
-                    onChanged: (value) {
-                      setState(() {
-                        isVibrateEnabled = value;
-                      });
-                    },
-                    inactiveThumbColor: Colors.white,
-                    activeTrackColor: Color(0xFF0C71B5),
-                    inactiveTrackColor: Color.fromRGBO(12, 113, 181, 0.4),
-                  ),
-                ),
-              ],
-            ),
-
-          
-              SizedBox(height: 24),
-            Container(
-  width: double.infinity, // Full-width button
-  decoration: BoxDecoration(
-    gradient: LinearGradient(
-      colors: [Color(0xFF31BCE2), Color(0xFF0664AE)], // Gradient colors
-      begin: Alignment.topCenter,
-      end: Alignment.bottomCenter,
-    ),
-    borderRadius: BorderRadius.circular(18), // Apply border-radius of 18px
-  ),
-  child: ElevatedButton(
-    onPressed: () {
-      // Action for the first button, for example, navigating to the profile update page
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => page3()),
-    );
-    },
-    style: ElevatedButton.styleFrom(
-      padding: EdgeInsets.symmetric(vertical: 16),
-      backgroundColor: Colors.transparent, // Set transparent to let the gradient show
-      shadowColor: Colors.transparent, // Remove shadow to match the gradient style
-      foregroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18), // Match the border-radius
-      ),
-    ),
-    child: Text(
-      'Save All Changes',
-      style: TextStyle(fontSize: 16),
-    ),
-  ),
-),// Adjust spacing to handle small screens
-          ],
+      body: SingleChildScrollView(
+        padding: EdgeInsets.symmetric(
+          horizontal: isSmallScreen ? 16 : 24,
+          vertical: 16
         ),
+        child: ConstrainedBox(
+          constraints: BoxConstraints(
+            minHeight: screenHeight,
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              SizedBox(height: isSmallScreen ? 10 : 20),
+              Text(
+                'Settings',
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 32 : 40,
+                  fontFamily: 'ChalkboardSE',
+                  fontWeight: FontWeight.w400,
+                  color: Color(0xFF262626),
+                ),
+              ),
+              SizedBox(height: isSmallScreen ? 24 : 32),
+              
+              // Personal Info Card
+              LayoutBuilder(
+                builder: (context, constraints) {
+                  return PersonalInfoCard(
+                    fullName: 'John Smith',
+                    dateOfBirth: '09 / 10 / 1991',
+                    email: 'john@example.com',
+                    img: AssetImage('assets/img/homeimg/Avatar.png'),
+                  );
+                },
+              ),
+
+              SizedBox(height: isSmallScreen ? 24 : 32),
+
+              // Notification Settings Section
+              _buildSettingRow(
+                context,
+                icon: isNotificationEnabled 
+                    ? Icons.notifications 
+                    : Icons.notifications_off,
+                label: 'General Notification',
+                value: isNotificationEnabled,
+                onChanged: (value) => setState(() => isNotificationEnabled = value),
+              ),
+
+            
+
+              _buildSettingRow(
+                context,
+                icon: isSoundEnabled ? Icons.volume_up : Icons.volume_off,
+                label: 'Sound',
+                value: isSoundEnabled,
+                onChanged: (value) => setState(() => isSoundEnabled = value),
+              ),
+
+              _buildSettingRow(
+                context,
+                icon: Icons.vibration,
+                label: 'Vibration',
+                value: isVibrateEnabled,
+                onChanged: (value) => setState(() => isVibrateEnabled = value),
+              ),
+
+              SizedBox(height: isSmallScreen ? 24 : 32),
+
+              // Logout Button
+              Center(
+                child: SizedBox(
+                  width: isSmallScreen ? screenWidth * 0.6 : 300,
+                  child: TextButton(
+                    onPressed: () {
+                      // Logout logic
+                    },
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.symmetric(
+                        vertical: isSmallScreen ? 12 : 16,
+                        horizontal: 24
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          Icons.logout,
+                          color: Color(0xFFB50000),
+                          size: isSmallScreen ? 20 : 24,
+                        ),
+                        SizedBox(width: 12),
+                        Text(
+                          'Log out',
+                          style: TextStyle(
+                            color: Color(0xFFB50000),
+                            fontFamily: 'Georgia',
+                            fontSize: isSmallScreen ? 20 : 24,
+                            fontWeight: FontWeight.w700,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildSettingRow(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final isSmallScreen = MediaQuery.of(context).size.width < 600;
+
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: isSmallScreen ? 8 : 12,
+        horizontal: isSmallScreen ? 12 : 16,
+      ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                color: value ? Color(0xFF0C71B5) : Color.fromRGBO(12, 113, 181, 0.4),
+                size: isSmallScreen ? 24 : 28,
+              ),
+              SizedBox(width: isSmallScreen ? 12 : 16),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Georgia',
+                  fontSize: isSmallScreen ? 20 : 24,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          Transform.scale(
+            scale: isSmallScreen ? 0.7 : 0.8,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              inactiveThumbColor: Colors.white,
+              activeTrackColor: Color(0xFF0C71B5),
+              inactiveTrackColor: Color.fromRGBO(12, 113, 181, 0.4),
+            ),
+          ),
+        ],
       ),
     );
   }

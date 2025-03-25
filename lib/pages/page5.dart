@@ -25,10 +25,7 @@ class PasswordChangedPage extends StatelessWidget {
               // 🎉 Success Message
               const Text(
                 "Password Changed!",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 10),
@@ -47,13 +44,11 @@ class PasswordChangedPage extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                 onPressed: () {
+                  onPressed: () {
                     // Navigate to Login Page
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SettingsPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

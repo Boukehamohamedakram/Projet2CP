@@ -13,9 +13,15 @@ class _SettingsPageState extends State<SettingsPage2> {
   bool isVibrateEnabled = true;
 
   // Define controllers for editable fields
-  TextEditingController fullNameController = TextEditingController(text: "John Smith");
-  TextEditingController dobController = TextEditingController(text: "09 / 10 / 1991");
-  TextEditingController emailController = TextEditingController(text: "john@example.comcomcom");
+  TextEditingController fullNameController = TextEditingController(
+    text: "John Smith",
+  );
+  TextEditingController dobController = TextEditingController(
+    text: "09 / 10 / 1991",
+  );
+  TextEditingController emailController = TextEditingController(
+    text: "john@example.comcomcom",
+  );
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +34,9 @@ class _SettingsPageState extends State<SettingsPage2> {
           margin: EdgeInsets.all(8),
           decoration: BoxDecoration(
             color: Colors.grey[200], // Light gray background for the box
-            borderRadius: BorderRadius.circular(12), // Rounded corners for the box
+            borderRadius: BorderRadius.circular(
+              12,
+            ), // Rounded corners for the box
           ),
           child: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black),
@@ -44,18 +52,21 @@ class _SettingsPageState extends State<SettingsPage2> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(height: 16), // Add space between the back button and the title
+            SizedBox(
+              height: 16,
+            ), // Add space between the back button and the title
             Text(
               'Settings',
               style: TextStyle(
                 fontSize: 32, // Adjusted for font size
-                fontFamily: 'ChalkboardSE', // Assuming you've added the font in your assets
-                fontWeight: FontWeight.w400, // Corrected to use Flutter's FontWeight
+                fontFamily:
+                    'ChalkboardSE', // Assuming you've added the font in your assets
+                fontWeight:
+                    FontWeight.w400, // Corrected to use Flutter's FontWeight
                 color: Color(0xFF262626), // Set color to #262626
               ),
             ),
             SizedBox(height: 24), // Add space after the title
-
             // Personal Info Section
             Container(
               padding: EdgeInsets.all(16.0),
@@ -68,10 +79,13 @@ class _SettingsPageState extends State<SettingsPage2> {
                     Color(0xFF0664AE), // End color (#0664AE)
                   ],
                 ),
-                borderRadius: BorderRadius.circular(21.67), // Rounded corners for the card
+                borderRadius: BorderRadius.circular(
+                  21.67,
+                ), // Rounded corners for the card
               ),
               child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center, // Aligning the content to center
+                crossAxisAlignment:
+                    CrossAxisAlignment.center, // Aligning the content to center
                 children: [
                   Center(
                     child: Text(
@@ -91,7 +105,11 @@ class _SettingsPageState extends State<SettingsPage2> {
                       CircleAvatar(
                         backgroundColor: Colors.white,
                         radius: 30,
-                        child: Icon(Icons.person, color: Color(0xFF62B2FF), size: 40), // Avatar icon
+                        child: Icon(
+                          Icons.person,
+                          color: Color(0xFF62B2FF),
+                          size: 40,
+                        ), // Avatar icon
                       ),
                       SizedBox(width: 16),
                       ElevatedButton(
@@ -102,7 +120,10 @@ class _SettingsPageState extends State<SettingsPage2> {
                             borderRadius: BorderRadius.circular(50),
                             side: BorderSide(color: Color(0xFF62B2FF)),
                           ),
-                          padding: EdgeInsets.symmetric(horizontal: 24, vertical: 8),
+                          padding: EdgeInsets.symmetric(
+                            horizontal: 24,
+                            vertical: 8,
+                          ),
                         ),
                         child: Text(
                           'Upload a new picture',
@@ -119,105 +140,146 @@ class _SettingsPageState extends State<SettingsPage2> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Text('Full Name:', style: TextStyle(fontSize: 16, color: Colors.white)),
-    Container(
-      width: 146,
-      height: 25,
-      decoration: ShapeDecoration(
-        color: Color(0xFFE9F6FE),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Color(0xFFE8ECF4)),
-          borderRadius: BorderRadius.circular(18),
-        ),
-      ),
-      child: TextField(
-        controller: fullNameController,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0), // Adjust padding
-          isDense: true, // Makes the TextField more compact
-        ),
-        style: TextStyle(
-          fontSize: 14, // Reduced font size to fit text in the container
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-        maxLines: 1, // Ensure it's a single-line TextField
-        textAlignVertical: TextAlignVertical.center, // Vertically center the text
-      ),
-    ),
-  ],
-),
-SizedBox(height: 8),
-Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Text('Date of Birth:', style: TextStyle(fontSize: 16, color: Colors.white)),
-    Container(
-      width: 146,
-      height: 25,
-      decoration: ShapeDecoration(
-        color: Color(0xFFE9F6FE),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Color(0xFFE8ECF4)),
-          borderRadius: BorderRadius.circular(18),
-        ),
-      ),
-      child: TextField(
-        controller: dobController,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0), // Adjust padding
-          isDense: true, // Makes the TextField more compact
-        ),
-        style: TextStyle(
-          fontSize: 14, // Reduced font size to fit text in the container
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-        maxLines: 1, // Ensure it's a single-line TextField
-        textAlignVertical: TextAlignVertical.center, // Vertically center the text
-      ),
-    ),
-  ],
-),
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Full Name:',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          Container(
+                            width: 146,
+                            height: 25,
+                            decoration: ShapeDecoration(
+                              color: Color(0xFFE9F6FE),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Color(0xFFE8ECF4),
+                                ),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: fullNameController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 0,
+                                ), // Adjust padding
+                                isDense:
+                                    true, // Makes the TextField more compact
+                              ),
+                              style: TextStyle(
+                                fontSize:
+                                    14, // Reduced font size to fit text in the container
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              maxLines:
+                                  1, // Ensure it's a single-line TextField
+                              textAlignVertical:
+                                  TextAlignVertical
+                                      .center, // Vertically center the text
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 8),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Date of Birth:',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          Container(
+                            width: 146,
+                            height: 25,
+                            decoration: ShapeDecoration(
+                              color: Color(0xFFE9F6FE),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Color(0xFFE8ECF4),
+                                ),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: dobController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 0,
+                                ), // Adjust padding
+                                isDense:
+                                    true, // Makes the TextField more compact
+                              ),
+                              style: TextStyle(
+                                fontSize:
+                                    14, // Reduced font size to fit text in the container
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              maxLines:
+                                  1, // Ensure it's a single-line TextField
+                              textAlignVertical:
+                                  TextAlignVertical
+                                      .center, // Vertically center the text
+                            ),
+                          ),
+                        ],
+                      ),
 
                       SizedBox(height: 8),
                       Row(
-  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-  children: [
-    Text('Email:', style: TextStyle(fontSize: 16, color: Colors.white)),
-    Container(
-      width: 146,
-      height: 25,
-      decoration: ShapeDecoration(
-        color: Color(0xFFE9F6FE),
-        shape: RoundedRectangleBorder(
-          side: BorderSide(width: 1, color: Color(0xFFE8ECF4)),
-          borderRadius: BorderRadius.circular(18),
-        ),
-      ),
-      child: TextField(
-        controller: emailController,
-        decoration: InputDecoration(
-          border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(horizontal: 12, vertical: 0),
-          isDense: true, // Reduces the height of the TextField
-        ),
-        style: TextStyle(
-          fontSize: 14, // Reduced font size to fit text in the container
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
-        ),
-        maxLines: 1, // Ensure it's a single-line TextField
-        textAlignVertical: TextAlignVertical.center, // Vertically center the text
-      ),
-    ),
-  ],
-),
-
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Email:',
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                          Container(
+                            width: 146,
+                            height: 25,
+                            decoration: ShapeDecoration(
+                              color: Color(0xFFE9F6FE),
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  width: 1,
+                                  color: Color(0xFFE8ECF4),
+                                ),
+                                borderRadius: BorderRadius.circular(18),
+                              ),
+                            ),
+                            child: TextField(
+                              controller: emailController,
+                              decoration: InputDecoration(
+                                border: InputBorder.none,
+                                contentPadding: EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 0,
+                                ),
+                                isDense:
+                                    true, // Reduces the height of the TextField
+                              ),
+                              style: TextStyle(
+                                fontSize:
+                                    14, // Reduced font size to fit text in the container
+                                fontWeight: FontWeight.bold,
+                                color: Colors.black,
+                              ),
+                              maxLines:
+                                  1, // Ensure it's a single-line TextField
+                              textAlignVertical:
+                                  TextAlignVertical
+                                      .center, // Vertically center the text
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ],
@@ -246,17 +308,20 @@ Row(
                 },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor: Colors.transparent, // Set transparent to let the gradient show
-                  shadowColor: Colors.transparent, // Remove shadow to match the gradient style
+                  backgroundColor:
+                      Colors
+                          .transparent, // Set transparent to let the gradient show
+                  shadowColor:
+                      Colors
+                          .transparent, // Remove shadow to match the gradient style
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(18), // Match the border-radius
+                    borderRadius: BorderRadius.circular(
+                      18,
+                    ), // Match the border-radius
                   ),
                 ),
-                child: Text(
-                  'Save All Changes',
-                  style: TextStyle(fontSize: 16),
-                ),
+                child: Text('Save All Changes', style: TextStyle(fontSize: 16)),
               ),
             ),
           ],

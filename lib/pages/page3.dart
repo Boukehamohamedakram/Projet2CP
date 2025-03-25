@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'page1.dart';
 
 class page3 extends StatelessWidget {
-  const page3 ({super.key});
+  const page3({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -25,10 +25,7 @@ class page3 extends StatelessWidget {
               // 🎉 Success Message
               const Text(
                 "Profile Updated !",
-                style: TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.bold,
-                ),
+                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
 
               const SizedBox(height: 10),
@@ -47,13 +44,11 @@ class page3 extends StatelessWidget {
                 width: double.infinity,
                 height: 50,
                 child: ElevatedButton(
-                 onPressed: () {
+                  onPressed: () {
                     // Navigate to Login Page
                     Navigator.pushReplacement(
                       context,
-                      MaterialPageRoute(
-                        builder: (context) => SettingsPage(),
-                      ),
+                      MaterialPageRoute(builder: (context) => SettingsPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(

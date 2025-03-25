@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'page5.dart';
+
 class ResetPasswordPage extends StatefulWidget {
   const ResetPasswordPage({super.key});
 
@@ -10,7 +11,7 @@ class ResetPasswordPage extends StatefulWidget {
 class _ResetPasswordPageState extends State<ResetPasswordPage> {
   bool _isObscure1 = true;
   bool _isObscure2 = true;
-  bool _isObscure3 = true;  // For Current Password field
+  bool _isObscure3 = true; // For Current Password field
 
   @override
   Widget build(BuildContext context) {
@@ -33,10 +34,7 @@ class _ResetPasswordPageState extends State<ResetPasswordPage> {
             // 📌 Header Text
             const Text(
               "Create New Password",
-              style: TextStyle(
-                fontSize: 28,
-                fontWeight: FontWeight.bold,
-              ),
+              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold),
             ),
 
             const SizedBox(height: 5),
