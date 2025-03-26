@@ -96,7 +96,7 @@ class QuizCard4 extends StatelessWidget {
 
                   // Grad and image (no space between them)
                   Image.asset(
-                    "assets/img/homeimg/Icon.png",
+                    "assets/img/Icon.png",
                     width: screenWidth * 0.1, // 10% of screen width
                     height: screenWidth * 0.07, // 6% of screen width
                     fit: BoxFit.contain,

@@ -94,7 +94,7 @@ class YourQuizItem extends StatelessWidget {
                         print("Result button pressed");
                       },
                       icon: Image.asset(
-                        "assets/img/homeimg/Frame 33.png",
+                        "assets/img/Frame 33.png",
                         width: screenWidth * 0.22, // Responsive width (22% of screen width)
                         height: screenWidth * 0.06, // Responsive height (6% of screen width)
                       ),
@@ -111,7 +111,7 @@ class YourQuizItem extends StatelessWidget {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   Image.asset(
-                    "assets/img/homeimg/Group 128.png",
+                    "assets/img/Group 128.png",
                     width: screenWidth * 0.25, // Responsive width (25% of screen width)
                     height: screenWidth * 0.1, // Responsive height (10% of screen width)
                   ),

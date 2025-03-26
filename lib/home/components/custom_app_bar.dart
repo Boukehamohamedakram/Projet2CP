@@ -31,7 +31,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
             Row(
               children: [
                 Image.asset(
-                  "assets/img/homeimg/Frame2.png",
+                  "assets/img/Frame2.png",
                   width: screenWidth * 0.05, // 5% of screen width
                   height: screenWidth * 0.05, // 5% of screen width
                 ),

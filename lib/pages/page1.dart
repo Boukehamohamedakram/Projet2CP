@@ -73,7 +73,7 @@ class _SettingsPageState extends State<SettingsPage> {
                     fullName: 'John Smith',
                     dateOfBirth: '09 / 10 / 1991',
                     email: 'john@example.com',
-                    img: AssetImage('assets/img/homeimg/Avatar.png'),
+                    img: AssetImage('assets/img/Avatar.png'),
                   );
                 },
               ),

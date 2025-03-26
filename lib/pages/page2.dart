@@ -29,7 +29,7 @@ class _SettingsPageState extends State<SettingsPage2> {
   void initState() {
     super.initState();
     // Initialize userimg with the default avatar image
-    userimg = File('assets/img/homeimg/Avatar.png');
+    userimg = File('assets/img/Avatar.png');
   }
 
   Future<void> _handleImageSelected(File newImage) async {
