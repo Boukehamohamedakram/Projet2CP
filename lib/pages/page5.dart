@@ -1,66 +1,103 @@
 import 'package:flutter/material.dart';
 import 'page1.dart';
 
-class PasswordChangedPage extends StatelessWidget {
-  const PasswordChangedPage({super.key});
+class Page5 extends StatelessWidget {
+  const Page5({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final scaleFactor = screenWidth / 375; // Base width (iPhone 8)
+    final isSmallScreen = screenWidth < 400;
+
     return Scaffold(
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 25),
+          padding: EdgeInsets.symmetric(horizontal: 25 * scaleFactor),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
               // ✅ Success Icon
               Image.asset(
-                'assets/img/group337.png', // Corrected image path (remove space before 'assets')
-                width: 100,
-                height: 100,
+                'assets/img/group337.png',
+                width: 100 * scaleFactor,
+                height: 100 * scaleFactor,
               ),
 
-              const SizedBox(height: 20),
+              SizedBox(height: isSmallScreen ? 24 : 32 * scaleFactor),
 
-              // 🎉 Success Message
-              const Text(
+              // Success Message
+              Text(
                 "Password Changed!",
-                style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  color: const Color(0xFF262626),
+                  fontFamily: 'Georgia',
+                  fontSize: isSmallScreen ? 28 : 32 * scaleFactor,
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w700,
+                  height: 1.0,
+                ),
               ),
 
-              const SizedBox(height: 10),
+              SizedBox(height: isSmallScreen ? 8 : 12 * scaleFactor),
 
-              // 📌 Description
-              const Text(
+              // Description
+              Text(
                 "Your password has been changed successfully.",
                 textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+                style: TextStyle(
+                  fontSize: isSmallScreen ? 13 : 14 * scaleFactor,
+                  color: const Color(0xFF5D5D5D),
+                  fontFamily: 'Georgia',
+                  fontStyle: FontStyle.normal,
+                  fontWeight: FontWeight.w400,
+                  height: 1.2, // Slightly more readable line height
+                ),
               ),
+              SizedBox(height: isSmallScreen ? 24 : 32 * scaleFactor),
 
-              const SizedBox(height: 30),
-
-              // 🔙 Back to Login Button
-              SizedBox(
+              Container(
                 width: double.infinity,
-                height: 50,
+                constraints: BoxConstraints(
+                  maxWidth: 400 * scaleFactor, // Prevent button from becoming too wide
+                ),
+                decoration: BoxDecoration(
+                  gradient: const LinearGradient(
+                    colors: [Color(0xFF31BCE2), Color(0xFF0664AE)],
+                    begin: Alignment.topCenter,
+                    end: Alignment.bottomCenter,
+                  ),
+                  borderRadius: BorderRadius.circular(18 * scaleFactor),
+                ),
                 child: ElevatedButton(
                   onPressed: () {
-                    // Navigate to Login Page
-                    Navigator.pushReplacement(
+                    Navigator.push(
                       context,
                       MaterialPageRoute(builder: (context) => SettingsPage()),
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.all(12),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+                    padding: EdgeInsets.symmetric(
+                      vertical: isSmallScreen ? 14 : 16 * scaleFactor,
                     ),
-                    backgroundColor: Colors.blue,
+                    backgroundColor: Colors.transparent,
+                    shadowColor: Colors.transparent,
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18 * scaleFactor),
+                    ),
+                    minimumSize: Size(
+                      50 * scaleFactor, 
+                      isSmallScreen ? 48 : 50 * scaleFactor
+                    ), // Minimum tap target size
                   ),
-                  child: const Text(
-                    "Back to Settings",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
+                  child: Text(
+                    'Back to Settings',
+                    style: TextStyle(
+                      fontSize: isSmallScreen ? 15 : 16 * scaleFactor,
+                      fontFamily: 'Georgia',
+                    ),
                   ),
                 ),
               ),

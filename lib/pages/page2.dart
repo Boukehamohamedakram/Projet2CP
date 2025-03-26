@@ -41,7 +41,6 @@ class _SettingsPageState extends State<SettingsPage2> {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
     final scaleFactor = screenWidth / 393.0; // Pixel 4 width as baseline
     final isSmallScreen = screenWidth < 600;
 
@@ -110,7 +109,7 @@ class _SettingsPageState extends State<SettingsPage2> {
                 onPressed: () {
                   Navigator.push(
                     context,
-                    MaterialPageRoute(builder: (context) => page3()),
+                    MaterialPageRoute(builder: (context) => Page3()),
                   );
                 },
                 style: ElevatedButton.styleFrom(
@@ -133,61 +132,6 @@ class _SettingsPageState extends State<SettingsPage2> {
             ),
           ],
         ),
-      ),
-    );
-  }
-
-  Widget _buildSettingSwitch(
-    BuildContext context, {
-    required IconData icon,
-    required String label,
-    required bool value,
-    required ValueChanged<bool> onChanged,
-  }) {
-    final scaleFactor = MediaQuery.of(context).size.width / 393.0;
-    
-    return Container(
-      padding: EdgeInsets.symmetric(
-        vertical: 8 * scaleFactor, 
-        horizontal: 12 * scaleFactor
-      ),
-      decoration: BoxDecoration(
-        color: Colors.grey[50],
-        borderRadius: BorderRadius.circular(12 * scaleFactor),
-      ),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Row(
-            children: [
-              Icon(
-                icon,
-                size: 24 * scaleFactor,
-                color: value ? Color(0xFF0C71B5) : Color.fromRGBO(12, 113, 181, 0.4),
-              ),
-              SizedBox(width: 12 * scaleFactor),
-              Text(
-                label,
-                style: TextStyle(
-                  fontFamily: 'Georgia',
-                  fontSize: 20 * scaleFactor,
-                  fontWeight: FontWeight.w400,
-                  color: Colors.black87,
-                ),
-              ),
-            ],
-          ),
-          Transform.scale(
-            scale: 0.7 * scaleFactor,
-            child: Switch(
-              value: value,
-              onChanged: onChanged,
-              inactiveThumbColor: Colors.white,
-              activeTrackColor: Color(0xFF0C71B5),
-              inactiveTrackColor: Color.fromRGBO(12, 113, 181, 0.4),
-            ),
-          ),
-        ],
       ),
     );
   }
