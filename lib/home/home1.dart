@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'quiz_card.dart';
-import 'your_quiz_item.dart';
-import 'custom_app_bar.dart';
+import 'components/quiz_card.dart';
+import 'components/your_quiz_item.dart';
+import 'components/custom_app_bar.dart';
 import 'home2.dart';
 import 'home3.dart'; // Import the CustomAppBar
 
@@ -13,10 +13,12 @@ class QuizHomePage extends StatelessWidget {
     final double screenHeight = MediaQuery.of(context).size.height;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      
+      
+    
       appBar: CustomAppBar(
         username: "Boukeha Akram",
-        profilePicture: "assets/img/homeimg/Avatar.png",
+        profilePicture: "assets/img/Avatar.png",
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -181,21 +183,21 @@ class QuizHomePage extends StatelessWidget {
                     title: "Integers Quiz",
                     quizzes: 10,
                     participants: 437,
-                    imagePath: 'assets/img/homeimg/Frame.png',
+                    imagePath: 'assets/img/Frame.png',
                   ),
                   SizedBox(height: screenHeight * 0.02), // 2% of screen height
                   YourQuizItem(
                     title: "General Knowledge",
                     quizzes: 6,
                     participants: 437,
-                    imagePath: 'assets/img/homeimg/Frame.png',
+                    imagePath: 'assets/img/Frame.png',
                   ),
                   SizedBox(height: screenHeight * 0.02), // 2% of screen height
                   YourQuizItem(
                     title: "General Knowledge",
                     quizzes: 6,
                     participants: 437,
-                    imagePath: 'assets/img/homeimg/Frame.png',
+                    imagePath: 'assets/img/Frame.png',
                   ),
                 ],
               ),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
-import 'quizcard4.dart'; // Import the QuizCard class
-import 'your_quiz_item.dart';
+import 'components/quizcard4.dart'; // Import the QuizCard class
+import 'components/your_quiz_item.dart';
 
 class QuizHomePage4 extends StatelessWidget {
   @override
@@ -63,7 +63,7 @@ class QuizHomePage4 extends StatelessWidget {
           title: "General Knowledge",
           quizzes: 6,
           participants: 437,
-          imagePath: 'assets/img/homeimg/Frame.png',
+          imagePath: 'assets/img/Frame.png',
         ),
 
         BackdropFilter(
@@ -84,7 +84,7 @@ class QuizHomePage4 extends StatelessWidget {
       time: "2min",
       section: "Section B",
       sharedBy: "Brandon Matrows",
-      imagePath: "assets/img/homeimg/Frame.png",
+      imagePath: "assets/img/Frame.png",
       grad: "5/15",
     ),
   ],

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'page3.dart';
-import 'class/UpPersonalInfoCard.dart';
+import 'components/UpPersonalInfoCard.dart';
 
 class SettingsPage2 extends StatefulWidget {
   @override
