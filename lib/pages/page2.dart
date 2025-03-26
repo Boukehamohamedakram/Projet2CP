@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'dart:io';
 import 'page3.dart';
+import 'class/UpPersonalInfoCard.dart';
 
 class SettingsPage2 extends StatefulWidget {
   @override
@@ -7,288 +9,93 @@ class SettingsPage2 extends StatefulWidget {
 }
 
 class _SettingsPageState extends State<SettingsPage2> {
-  // Define state variables for the switches
   bool isNotificationEnabled = true;
   bool isSoundEnabled = true;
   bool isVibrateEnabled = true;
-
-  // Define controllers for editable fields
+  
   TextEditingController fullNameController = TextEditingController(
-    text: "John Smith",
+    text: "Yakoub Moussa",
   );
   TextEditingController dobController = TextEditingController(
     text: "09 / 10 / 1991",
   );
   TextEditingController emailController = TextEditingController(
-    text: "john@example.comcomcom",
+    text: "john@example.com",
   );
+  
+  File? userimg;
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize userimg with the default avatar image
+    userimg = File('assets/img/homeimg/Avatar.png');
+  }
+
+  Future<void> _handleImageSelected(File newImage) async {
+    setState(() {
+      userimg = newImage;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    final scaleFactor = screenWidth / 393.0; // Pixel 4 width as baseline
+    final isSmallScreen = screenWidth < 600;
+
     return Scaffold(
-      backgroundColor: Colors.white, // Set background color to white
+      backgroundColor: Colors.white,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
         leading: Container(
-          margin: EdgeInsets.all(8),
+          margin: EdgeInsets.all(8 * scaleFactor),
           decoration: BoxDecoration(
-            color: Colors.grey[200], // Light gray background for the box
-            borderRadius: BorderRadius.circular(
-              12,
-            ), // Rounded corners for the box
+            borderRadius: BorderRadius.circular(12 * scaleFactor),
+            border: Border.all(
+              color: Colors.grey[300]!,
+              width: 1 * scaleFactor,
+            ),
           ),
           child: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.pop(context); // Go back to the previous page
-            },
+            iconSize: 24 * scaleFactor,
+            onPressed: () => Navigator.pop(context),
           ),
         ),
         centerTitle: true,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0 * scaleFactor),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            SizedBox(
-              height: 16,
-            ), // Add space between the back button and the title
+            SizedBox(height: 10 * scaleFactor),
             Text(
               'Settings',
               style: TextStyle(
-                fontSize: 32, // Adjusted for font size
-                fontFamily:
-                    'ChalkboardSE', // Assuming you've added the font in your assets
-                fontWeight:
-                    FontWeight.w400, // Corrected to use Flutter's FontWeight
-                color: Color(0xFF262626), // Set color to #262626
+                fontSize: 32 * scaleFactor,
+                fontFamily: 'ChalkboardSE',
+                fontWeight: FontWeight.w400,
+                color: Color(0xFF262626),
               ),
             ),
-            SizedBox(height: 24), // Add space after the title
-            // Personal Info Section
-            Container(
-              padding: EdgeInsets.all(16.0),
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                  colors: [
-                    Color(0xFF31BCE2), // Start color (#31BCE2)
-                    Color(0xFF0664AE), // End color (#0664AE)
-                  ],
-                ),
-                borderRadius: BorderRadius.circular(
-                  21.67,
-                ), // Rounded corners for the card
-              ),
-              child: Column(
-                crossAxisAlignment:
-                    CrossAxisAlignment.center, // Aligning the content to center
-                children: [
-                  Center(
-                    child: Text(
-                      "Personal Info",
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontFamily: 'Georgia',
-                        fontWeight: FontWeight.w400,
-                        color: Color(0xFFFFFFFF), // White color for the title
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      CircleAvatar(
-                        backgroundColor: Colors.white,
-                        radius: 30,
-                        child: Icon(
-                          Icons.person,
-                          color: Color(0xFF62B2FF),
-                          size: 40,
-                        ), // Avatar icon
-                      ),
-                      SizedBox(width: 16),
-                      ElevatedButton(
-                        onPressed: () {},
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.white,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(50),
-                            side: BorderSide(color: Color(0xFF62B2FF)),
-                          ),
-                          padding: EdgeInsets.symmetric(
-                            horizontal: 24,
-                            vertical: 8,
-                          ),
-                        ),
-                        child: Text(
-                          'Upload a new picture',
-                          style: TextStyle(
-                            color: Color(0xFF62B2FF),
-                            fontSize: 16,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Full Name:',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                          Container(
-                            width: 146,
-                            height: 25,
-                            decoration: ShapeDecoration(
-                              color: Color(0xFFE9F6FE),
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 1,
-                                  color: Color(0xFFE8ECF4),
-                                ),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            child: TextField(
-                              controller: fullNameController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 0,
-                                ), // Adjust padding
-                                isDense:
-                                    true, // Makes the TextField more compact
-                              ),
-                              style: TextStyle(
-                                fontSize:
-                                    14, // Reduced font size to fit text in the container
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines:
-                                  1, // Ensure it's a single-line TextField
-                              textAlignVertical:
-                                  TextAlignVertical
-                                      .center, // Vertically center the text
-                            ),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Date of Birth:',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                          Container(
-                            width: 146,
-                            height: 25,
-                            decoration: ShapeDecoration(
-                              color: Color(0xFFE9F6FE),
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 1,
-                                  color: Color(0xFFE8ECF4),
-                                ),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            child: TextField(
-                              controller: dobController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 0,
-                                ), // Adjust padding
-                                isDense:
-                                    true, // Makes the TextField more compact
-                              ),
-                              style: TextStyle(
-                                fontSize:
-                                    14, // Reduced font size to fit text in the container
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines:
-                                  1, // Ensure it's a single-line TextField
-                              textAlignVertical:
-                                  TextAlignVertical
-                                      .center, // Vertically center the text
-                            ),
-                          ),
-                        ],
-                      ),
+            SizedBox(height: 24 * scaleFactor),
 
-                      SizedBox(height: 8),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Text(
-                            'Email:',
-                            style: TextStyle(fontSize: 16, color: Colors.white),
-                          ),
-                          Container(
-                            width: 146,
-                            height: 25,
-                            decoration: ShapeDecoration(
-                              color: Color(0xFFE9F6FE),
-                              shape: RoundedRectangleBorder(
-                                side: BorderSide(
-                                  width: 1,
-                                  color: Color(0xFFE8ECF4),
-                                ),
-                                borderRadius: BorderRadius.circular(18),
-                              ),
-                            ),
-                            child: TextField(
-                              controller: emailController,
-                              decoration: InputDecoration(
-                                border: InputBorder.none,
-                                contentPadding: EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 0,
-                                ),
-                                isDense:
-                                    true, // Reduces the height of the TextField
-                              ),
-                              style: TextStyle(
-                                fontSize:
-                                    14, // Reduced font size to fit text in the container
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                              maxLines:
-                                  1, // Ensure it's a single-line TextField
-                              textAlignVertical:
-                                  TextAlignVertical
-                                      .center, // Vertically center the text
-                            ),
-                          ),
-                        ],
-                      ),
-                    ],
-                  ),
-                ],
-              ),
+            // Personal Info Card with image handling
+            UpPersonalInfoCard(
+              fullNameController: fullNameController,
+              dobController: dobController,
+              emailController: emailController,
+              userimg: userimg,
+              onImageSelected: _handleImageSelected,
             ),
 
-            SizedBox(height: 24),
+            SizedBox(height: isSmallScreen ? 40 * scaleFactor : 100 * scaleFactor),
 
-            // Save All Changes Button
+            // Save Button
             Container(
               width: double.infinity,
               decoration: BoxDecoration(
@@ -297,7 +104,7 @@ class _SettingsPageState extends State<SettingsPage2> {
                   begin: Alignment.topCenter,
                   end: Alignment.bottomCenter,
                 ),
-                borderRadius: BorderRadius.circular(18),
+                borderRadius: BorderRadius.circular(18 * scaleFactor),
               ),
               child: ElevatedButton(
                 onPressed: () {
@@ -307,26 +114,89 @@ class _SettingsPageState extends State<SettingsPage2> {
                   );
                 },
                 style: ElevatedButton.styleFrom(
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                  backgroundColor:
-                      Colors
-                          .transparent, // Set transparent to let the gradient show
-                  shadowColor:
-                      Colors
-                          .transparent, // Remove shadow to match the gradient style
+                  padding: EdgeInsets.symmetric(vertical: 16 * scaleFactor),
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
                   foregroundColor: Colors.white,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(
-                      18,
-                    ), // Match the border-radius
+                    borderRadius: BorderRadius.circular(18 * scaleFactor),
                   ),
                 ),
-                child: Text('Save All Changes', style: TextStyle(fontSize: 16)),
+                child: Text(
+                  'Save All Changes', 
+                  style: TextStyle(
+                    fontSize: 16 * scaleFactor,
+                    fontFamily: 'Georgia',
+                  ),
+                ),
               ),
             ),
           ],
         ),
       ),
     );
+  }
+
+  Widget _buildSettingSwitch(
+    BuildContext context, {
+    required IconData icon,
+    required String label,
+    required bool value,
+    required ValueChanged<bool> onChanged,
+  }) {
+    final scaleFactor = MediaQuery.of(context).size.width / 393.0;
+    
+    return Container(
+      padding: EdgeInsets.symmetric(
+        vertical: 8 * scaleFactor, 
+        horizontal: 12 * scaleFactor
+      ),
+      decoration: BoxDecoration(
+        color: Colors.grey[50],
+        borderRadius: BorderRadius.circular(12 * scaleFactor),
+      ),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Row(
+            children: [
+              Icon(
+                icon,
+                size: 24 * scaleFactor,
+                color: value ? Color(0xFF0C71B5) : Color.fromRGBO(12, 113, 181, 0.4),
+              ),
+              SizedBox(width: 12 * scaleFactor),
+              Text(
+                label,
+                style: TextStyle(
+                  fontFamily: 'Georgia',
+                  fontSize: 20 * scaleFactor,
+                  fontWeight: FontWeight.w400,
+                  color: Colors.black87,
+                ),
+              ),
+            ],
+          ),
+          Transform.scale(
+            scale: 0.7 * scaleFactor,
+            child: Switch(
+              value: value,
+              onChanged: onChanged,
+              inactiveThumbColor: Colors.white,
+              activeTrackColor: Color(0xFF0C71B5),
+              inactiveTrackColor: Color.fromRGBO(12, 113, 181, 0.4),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  @override
+  void dispose() {
+    fullNameController.dispose();
+    dobController.dispose();
+    emailController.dispose();
+    super.dispose();
   }
 }
