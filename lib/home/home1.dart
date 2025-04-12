@@ -15,18 +15,20 @@ class QuizHomePage extends StatelessWidget {
     return Scaffold(
       
       
-    
+    backgroundColor: Colors.white,
       appBar: CustomAppBar(
         username: "Boukeha Akram",
         profilePicture: "assets/img/Avatar.png",
       ),
       body: SingleChildScrollView(
+        
         child: Padding(
           padding: EdgeInsets.all(screenWidth * 0.04), // 4% of screen width
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Container with "Upcoming Quizzes" text
+              
               Container(
                 alignment: Alignment.centerLeft,
 

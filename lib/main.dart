@@ -1,7 +1,8 @@
 // main.dart
 import 'package:flutter/material.dart';
 import 'consult/components/appbar.dart';
-import 'home/home1.dart'; // Ensure this path is correct
+// import 'home/home1.dart'; 
+import 'Settings/page1.dart';
 
 void main() => runApp(MyApp());
 
@@ -24,7 +25,7 @@ class MainPage extends StatelessWidget {
         child: ElevatedButton(
           onPressed: () => Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) =>  QuizHomePage()),
+            MaterialPageRoute(builder: (context) => SettingsPage()),
           ),
           child: const Text('Start Quiz'),
         ),
