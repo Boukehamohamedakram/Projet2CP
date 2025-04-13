@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-@h+))x6l91od78+paah0gax0e8zw0xz0(mov8s579muvu-yei1
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -46,6 +46,7 @@ INSTALLED_APPS = [
     'users',
     'Quiz',
     'notifications',
+    'corsheaders',
 ]
 
 AUTH_USER_MODEL = 'users.User'
@@ -65,6 +66,7 @@ REST_FRAMEWORK = {
 
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
