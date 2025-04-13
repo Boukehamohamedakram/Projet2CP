@@ -100,15 +100,10 @@ WSGI_APPLICATION = 'BackQuiz.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'quiz_db',
-        'USER': 'postgres',
-        'PASSWORD': 'team41',
-        'HOST': '192.168.56.1',
-        'PORT': '5432',
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
