@@ -1,0 +1,352 @@
+/* QuizPILogin.css */
+
+body {
+  background-image: url('src/assets/Log in - Wrong pwd.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.login-page-container {
+  background-image: url('src/assets/Log in - Wrong pwd.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+}
+
+.login-card {
+  width: 100%;
+  max-width: 400px;
+  border-radius: 18px;
+  background: #FFF;
+  box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.08), 
+              0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.12), 
+              0px 24.347px 75.273px 0px rgba(0, 0, 0, 0.14), 
+              0px 13.648px 42.198px 0px rgba(0, 0, 0, 0.17), 
+              0px 7.249px 22.411px 0px rgba(0, 0, 0, 0.21), 
+              0px 3.016px 9.326px 0px rgba(0, 0, 0, 0.29);
+  padding: 2.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: auto;
+  box-sizing: border-box;
+}
+
+.login-logo-container {
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.logo-icon {
+  color: #31BCE2;
+  margin-left: 1rem;
+  margin-bottom: -2rem;
+  width: 100%;
+  max-width: 77px;
+  height: auto;
+}
+
+.logo-icon svg {
+  width: 100%;
+  height: auto;
+}
+
+.logo-text {
+  display: flex;
+  width: 6.625rem;
+  height: 3.5rem;
+  flex-direction: column;
+  justify-content: center;
+  flex-shrink: 0;
+  font-family: "Chalkboard SE", cursive;
+  font-size: 2.25rem;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  letter-spacing: -0.09rem;
+  text-transform: capitalize;
+  background: linear-gradient(180deg, #31BCE2 0%, #0664AE 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: #0664AE; /* fallback color if gradient isn't supported */
+}
+
+@font-face {
+  font-family: 'Chalkboard SE';
+  src: url('src/assets/fonts/ChalkboardSE-Bold-03_0.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Georgia';
+  src: url('src/assets/fonts/georgia.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
+
+.login-form {
+  width: 100%;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+  position: relative;
+  width: 100%;
+}
+
+.form-label {
+  margin-bottom: 0.3rem;
+  color: #0A0404;
+  font-size: 13px;
+  font-weight: 400;
+  display: block;
+  font-family: 'Georgia', serif;
+}
+
+.input-field {
+  width: 100%;
+  height: 2.25rem;
+  border-radius: 1.125rem;
+  border: 1px solid #E8ECF4;
+  background: #E9F6FE;
+  padding: 0 1rem;
+  box-sizing: border-box;
+}
+
+.input-control {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: #0A0404;
+  outline: none;
+}
+
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: 2.25rem;
+  border-radius: 1.125rem;
+  border: 1px solid #E8ECF4;
+  background: #E9F6FE;
+}
+
+.password-input-wrapper .input-control {
+  padding: 0 2.5rem 0 1rem;
+  border-radius: 1.125rem;
+  box-sizing: border-box;
+}
+
+.toggle-password {
+  position: absolute;
+  right: 1rem;
+  cursor: pointer;
+  color: #0664AE;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.toggle-password:hover {
+  color: #31BCE2;
+}
+
+
+.forgot-password-link {
+  color: #5D5D5D;
+  font-size: 12px;
+  margin: -0.5rem 0 2rem 9rem;
+
+  text-decoration: none;
+  font-family: 'Georgia', serif;
+}
+
+.forgot-password-link:hover {
+  text-decoration: underline;
+}
+
+.error-message {
+  color: #d32f2f;
+  margin-bottom: 0.75rem;
+  font-size: 14px;
+  width: 100%;
+}
+
+.login-button {
+  display: flex;
+  width: 100%;
+  padding: 0.6rem 0;
+  justify-content: center;
+  align-items: center;
+  gap: 0.5rem;
+  border-radius: 1.125rem;
+  background: linear-gradient(180deg, #31BCE2 0%, #0664AE 100%);
+  color: white;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: opacity 0.3s;
+}
+
+.login-button:hover {
+  opacity: 0.9;
+}
+
+.register-prompt {
+  color: #5D5D5D;
+  font-size: 14px;
+  font-weight: 500;
+  text-align: center;
+  margin: 1rem 0 0;
+  width: 100%;
+}
+
+.register-link {
+  color: #0664AE;
+  text-decoration: none;
+}
+
+.register-link:hover {
+  text-decoration: underline;
+}
+
+/* Responsive design */
+@media (max-width: 768px) {
+  .login-card {
+    max-width: 360px;
+    padding: 2rem 1.75rem;
+  }
+  
+  .logo-text {
+    font-size: 2rem;
+    height: 3rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .login-card {
+    max-width: 90%;
+    padding: 1.5rem;
+    border-radius: 12px;
+  }
+  
+  .logo-icon {
+    margin-bottom: -1.75rem;
+    max-width: 65px;
+  }
+  
+  .logo-text {
+    font-size: 1.75rem;
+    height: 2.5rem;
+    width: 5.5rem;
+  }
+  
+  .login-button {
+    padding: 0.5rem 0;
+    font-size: 0.9rem;
+  }
+  
+  .form-label {
+    font-size: 12px;
+  }
+  
+  .input-field, .password-input-wrapper {
+    height: 2rem;
+  }
+}
+
+@media (max-width: 320px) {
+  .login-card {
+    padding: 1.25rem 1rem;
+  }
+  
+  .logo-icon {
+    max-width: 55px;
+    margin-bottom: -1.5rem;
+  }
+  
+  .logo-text {
+    font-size: 1.5rem;
+    height: 2.25rem;
+  }
+  
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+  
+  .forgot-password-container {
+    margin-bottom: 1rem;
+  }
+  
+  .forgot-password-link {
+    font-size: 11px;
+  }
+}
+
+/* Handle very small screens and landscape orientation */
+@media (max-height: 500px) and (orientation: landscape) {
+  .login-page-container {
+    align-items: flex-start;
+    padding: 1rem 0;
+  }
+  
+  .login-card {
+    padding: 1.25rem;
+    max-height: 90vh;
+    overflow-y: auto;
+  }
+  
+  .logo-icon {
+    max-width: 50px;
+    margin-bottom: -1.5rem;
+  }
+  
+  .logo-text {
+    font-size: 1.5rem;
+    height: 2rem;
+  }
+  
+  .form-group {
+    margin-bottom: 0.75rem;
+  }
+}
+
+/* For high-resolution displays */
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  .login-page-container {
+    background-image: url('src/assets/Log in - Wrong pwd@2x.png');
+  }
+}
+
+/* Handle dark mode preferences */
+@media (prefers-color-scheme: dark) {
+  .login-card {
+    box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.2), 
+                0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.25);
+  }
+}
