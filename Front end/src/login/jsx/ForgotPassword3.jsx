@@ -1,43 +1,40 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import "../css/ForgotPassword3.css";
 
 const ForgotPassword = () => {
   const [email, setEmail] = useState("");
-  const [isCodeSent, setIsCodeSent] = useState(false);
   const [error, setError] = useState("");
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    
+
     if (!email) {
       setError("Please enter your email address");
       return;
     }
-    
-    // Email validation
+
     const emailRegex = /^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$/;
     if (!emailRegex.test(email)) {
       setError("Please enter a valid email address");
       return;
     }
-    
-    // Simulate sending code
+
     console.log("Sending code to:", email);
-    setIsCodeSent(true);
-    setError("");
+
+    // ✅ Additional logic (e.g., API call or localStorage)
+    localStorage.setItem("resetEmail", email);
+
+    // ✅ Navigate to verification page
+    navigate("/otp-verification");
   };
 
   return (
     <div className="forgot-password-container">
       <div className="forgot-password-card">
-      
-        
         <h2>Forgot Password?</h2>
-        
-        <p>
-          Don't worry! It occurs. Please enter the email address linked with your account.
-        </p>
+        <p>Don't worry! It occurs. Please enter the email address linked with your account.</p>
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
@@ -63,9 +60,7 @@ const ForgotPassword = () => {
 
         <div className="login-link">
           <span>Remember Password? </span>
-          <Link to="/login" >
-          Login Now
-          </Link>
+          <Link to="/login">Login Now</Link>
         </div>
       </div>
     </div>

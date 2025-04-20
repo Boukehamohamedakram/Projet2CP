@@ -3,37 +3,62 @@ import { Link } from "react-router-dom";
 import "../css/LoginPage1.css";
 
 export default function LoginPage() {
-  const [email, setEmail] = useState("");
+  const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", { email, password });
-    // Add your authentication logic here
+    console.log("Login attempted with:", { username, password });
+  
+    try {
+      const response = await fetch("http://localhost:8000/api/users/login/", {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username, password }),
+      });
+      
+      
+  
+      if (response.ok) {
+        const data = await response.json();
+        console.log("Login successful:", data);
+  
+        // ✅ Save token to localStorage or state
+        localStorage.setItem("token", data.token);
+      } else {
+        const errorData = await response.json();
+        console.error("Login failed:", errorData);
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+    }
   };
-
+  
+  
   return (
     <div className="login-card">
       <div className="login-logo-container">
         <div className="logo-icon">
-          {/* SVG code here */}
+        
         </div>
         <h2 className="logo-text">QuizPI</h2>
       </div>
 
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
-          <label className="form-label">Enter your e-mail address:</label>
+          <label className="form-label">Enter your username:</label>
           <div className="input-field">
             <input
-              type="email"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
               required
               className="input-control"
-              placeholder="email@example.com"
+              placeholder="johndoe123"
             />
           </div>
         </div>
@@ -87,17 +112,20 @@ export default function LoginPage() {
           </div>
         </div>
 
-      
-          <Link to="/forgot-password" className="forgot-password-link">
-            Forgot Password?
-          </Link>
-    
+        <Link to="/forgot-password" className="forgot-password-link">
+          Forgot Password?
+        </Link>
 
         {error && <div className="error-message">{error}</div>}
 
         <button type="submit" className="login-button">
           Login
         </button>
+
+        <div className="login-link">
+          <span>Don't have an account? </span>
+          <Link to="/signup">SignUp</Link>
+        </div>
       </form>
     </div>
   );

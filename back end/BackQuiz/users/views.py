@@ -6,6 +6,8 @@ from .models import User
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 from .permissions import IsTeacher
 
+from rest_framework.permissions import AllowAny
+
 # ✅ Teacher can manage users (CRUD)
 class UserListCreateView(generics.ListCreateAPIView):
     queryset = User.objects.all()
@@ -20,6 +22,8 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 # ✅ User Registration
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
+    # yakoub add
+    permission_classes = [AllowAny] 
 
 from rest_framework.authtoken.models import Token
 from rest_framework.response import Response
@@ -30,6 +34,7 @@ from .models import User
 
 class LoginView(generics.GenericAPIView):  # ✅ Use GenericAPIView
     serializer_class = LoginSerializer
+    permission_classes = [AllowAny]  
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

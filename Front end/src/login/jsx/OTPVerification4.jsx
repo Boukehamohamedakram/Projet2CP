@@ -83,6 +83,7 @@ const OTPVerification = () => {
 
   const handleResend = () => {
     console.log("Resending OTP");
+    
     // Add your resend logic here
   };
 

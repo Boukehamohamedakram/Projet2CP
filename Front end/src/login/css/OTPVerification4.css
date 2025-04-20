@@ -144,6 +144,12 @@ form {
   text-decoration: underline;
 }
 
+.resend-button:focus {
+  outline: none;
+  border: none;
+  box-shadow: none;
+}
+
 /* Add responsive adjustments */
 @media (max-width: 480px) {
   .otp-verification-card {
