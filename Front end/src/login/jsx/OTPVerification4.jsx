@@ -88,6 +88,7 @@ const OTPVerification = () => {
   };
 
   return (
+    <div className="otp-verification-background">
     <div className="otp-verification-container">
       <div className="otp-verification-card">
         
@@ -127,6 +128,7 @@ const OTPVerification = () => {
           <button onClick={handleResend} className="resend-button">Resend</button>
         </div>
       </div>
+    </div>
     </div>
   );
 };
