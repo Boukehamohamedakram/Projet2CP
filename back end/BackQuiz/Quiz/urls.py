@@ -4,7 +4,8 @@ from .views import (
     QuestionListCreateView, QuestionDetailView,
     OptionListCreateView, OptionDetailView,
     StudentAnswerListCreateView, StudentAnswerDetailView,
-    ResultListView
+    ResultListView ,
+    GroupListCreateView, GroupDetailView
 )
 
 urlpatterns = [
@@ -12,6 +13,10 @@ urlpatterns = [
     path('quizzes/', QuizListCreateView.as_view(), name='quiz-list-create'),
     path('quizzes/<int:pk>/', QuizDetailView.as_view(), name='quiz-detail'),
     path('quizzes/assigned/', AssignedQuizListView.as_view(), name='assigned-quizzes'),
+
+    path('groups/', GroupListCreateView.as_view(), name='group-list-create'),
+    path('groups/<int:pk>/', GroupDetailView.as_view(), name='group-detail'),
+
 
     # Question URLs
     path('questions/', QuestionListCreateView.as_view(), name='question-list-create'),

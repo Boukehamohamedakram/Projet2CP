@@ -1,6 +1,7 @@
 from rest_framework import generics, permissions
-from .models import Quiz, Question, Option, StudentAnswer, Result
-from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer
+from .models import Quiz, Question, Option, StudentAnswer, Result, Group
+from django.contrib.auth import get_user_model
+from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 
 # ✅ Quiz Views
@@ -10,8 +11,15 @@ class QuizListCreateView(generics.ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated, IsTeacherOrReadOnly]  # Students can view, teachers can create/edit
 
     def perform_create(self, serializer):
+        # Save the quiz with the teacher as the creator
         quiz = serializer.save(teacher=self.request.user)
-        quiz.assigned_students.set(serializer.validated_data.get('assigned_students', []))
+
+        # Explicitly set assigned students and groups (no auto-adding group members)
+        assigned_students = serializer.validated_data.get('assigned_students', [])
+        assigned_groups = serializer.validated_data.get('assigned_groups', [])
+
+        quiz.assigned_students.set(assigned_students)
+        quiz.assigned_groups.set(assigned_groups)
 
 class AssignedQuizListView(generics.ListAPIView):
     serializer_class = QuizSerializer
@@ -24,7 +32,19 @@ class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacherOrReadOnly]
-
+    
+    def perform_update(self, serializer):
+        # Save the quiz with core fields
+        quiz = serializer.save()
+        
+        # Handle assigned students and groups manually to prevent auto-selection
+        if 'assigned_students' in serializer.validated_data:
+            assigned_students = serializer.validated_data.get('assigned_students', [])
+            quiz.assigned_students.set(assigned_students)
+            
+        if 'assigned_groups' in serializer.validated_data:
+            assigned_groups = serializer.validated_data.get('assigned_groups', [])
+            quiz.assigned_groups.set(assigned_groups)
 # ✅ Question Views (Belongs to a quiz)
 class QuestionListCreateView(generics.ListCreateAPIView):
     serializer_class = QuestionSerializer
@@ -86,3 +106,21 @@ class ResultListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Result.objects.filter(student=self.request.user)  # Students only see their own results
+
+# ✅ Group Views (for Teachers)
+class GroupListCreateView(generics.ListCreateAPIView):
+    serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def get_queryset(self):
+        return Group.objects.filter(teacher=self.request.user)
+
+    def perform_create(self, serializer):
+        serializer.save(teacher=self.request.user)
+
+class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
+    serializer_class = GroupSerializer
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def get_queryset(self):
+        return Group.objects.filter(teacher=self.request.user)
