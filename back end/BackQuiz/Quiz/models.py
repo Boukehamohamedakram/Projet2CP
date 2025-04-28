@@ -1,5 +1,6 @@
 from django.db import models
 from django.conf import settings
+from django.utils import timezone
 
 User = settings.AUTH_USER_MODEL  # Reference the custom User model
 
@@ -39,8 +40,26 @@ class Quiz(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='math')
 
-    def __str__(self):
-        return self.title
+    
+    @property
+    def is_active(self):
+        """Check if the quiz is currently active based on time"""
+        now = timezone.now()
+        
+        # If no start/end times are set, quiz is always active
+        if not self.start_time and not self.end_time:
+            return True
+            
+        # If only start_time is set
+        if self.start_time and not self.end_time:
+            return now >= self.start_time
+            
+        # If only end_time is set
+        if not self.start_time and self.end_time:
+            return now <= self.end_time
+            
+        # If both are set
+        return self.start_time <= now <= self.end_time
 
 
 
@@ -53,6 +72,7 @@ class Question(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='questions')
     text = models.TextField()
     question_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
+    points = models.PositiveIntegerField(default=1)  # Add points field with default value of 1
 
     def __str__(self):
         return self.text
@@ -66,25 +86,50 @@ class Option(models.Model):
         return self.text
 
 class StudentAnswer(models.Model):
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='answers')
-    question = models.ForeignKey(Question, on_delete=models.CASCADE, related_name='student_answers')
-    selected_option = models.ForeignKey(Option, null=True, blank=True, on_delete=models.SET_NULL)
-    text_answer = models.TextField(blank=True, null=True)
-    submitted_at = models.DateTimeField(auto_now_add=True)
-
-    def is_correct(self):
-        if self.question.question_type in ['mcq', 'tf'] and self.selected_option:
-            return self.selected_option.is_correct
-        return None
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Option, on_delete=models.CASCADE, null=True, blank=True)
+    text_answer = models.TextField(null=True, blank=True)  # For open-ended questions
+    earned_points = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # For manual grading
+    
+    class Meta:
+        unique_together = ('student', 'question')
 
 class Result(models.Model):
-    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='results')
-    student = models.ForeignKey(User, on_delete=models.CASCADE, related_name='results')
-    score = models.FloatField(default=0)
-    completed_at = models.DateTimeField(auto_now_add=True)
-
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
+    max_score = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # Total possible points
+    completed_at = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        unique_together = ('quiz', 'student')
+        
     def calculate_score(self):
-        correct_answers = self.student.answers.filter(question__quiz=self.quiz, selected_option__is_correct=True).count()
-        total_questions = self.quiz.questions.count()
-        self.score = (correct_answers / total_questions) * 100 if total_questions > 0 else 0
+        """Calculate the score based on correct answers and question points"""
+        student_answers = StudentAnswer.objects.filter(
+            question__quiz=self.quiz,
+            student=self.student
+        )
+        
+        total_points = 0
+        earned_points = 0
+        
+        # Calculate total possible points for the quiz
+        for question in self.quiz.questions.all():
+            total_points += question.points
+        
+        # Calculate earned points from correct answers
+        for answer in student_answers:
+            if answer.question.question_type in ['mcq', 'tf']:
+                if answer.selected_option and answer.selected_option.is_correct:
+                    earned_points += answer.question.points
+            # For open-ended questions, use the manually assigned score
+            elif answer.question.question_type == 'open':
+                earned_points += answer.earned_points
+        
+        self.score = earned_points
+        self.max_score = total_points
         self.save()
+        
+        return self.score, self.max_score

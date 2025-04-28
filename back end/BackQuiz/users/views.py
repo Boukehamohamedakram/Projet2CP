@@ -30,6 +30,7 @@ from .models import User
 
 class LoginView(generics.GenericAPIView):  # ✅ Use GenericAPIView
     serializer_class = LoginSerializer
+    permission_classes = [permissions.AllowAny]  # ✅ Allow any user to access this view
 
     def post(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)

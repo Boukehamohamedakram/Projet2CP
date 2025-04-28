@@ -7,14 +7,15 @@ User = get_user_model()  # ✅ Fetch the actual User model dynamically
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Option
-        fields = ['id', 'text', 'is_correct']
+        fields = ['id', 'question', 'text', 'is_correct']
+        
 
 class QuestionSerializer(serializers.ModelSerializer):
     options = OptionSerializer(many=True, required=False)
 
     class Meta:
         model = Question
-        fields = ['id', 'quiz', 'text', 'question_type', 'options']
+        fields = ['id', 'quiz', 'text', 'question_type', 'points', 'options']
 
     def create(self, validated_data):
         options_data = validated_data.pop('options', [])
@@ -57,7 +58,9 @@ class QuizSerializer(serializers.ModelSerializer):
         fields = [
             'id', 'title', 'description', 'teacher',
             'assigned_students', 'assigned_groups',
-            'time_limit', 'is_published', 'category', 'questions'
+            'time_limit', 'is_published', 'category', 'questions',
+            
+                 'start_time', 'end_time', 'is_active'
         ]
 
     def create(self, validated_data):
