@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import Quiz, Question, Option, StudentAnswer, Result,Group, User
+from .models import Quiz, Question, Option, StudentAnswer, Result, Group, User, QuizAttempt
 from django.contrib.auth import get_user_model
 User = get_user_model()  # ✅ Fetch the actual User model dynamically
 
@@ -60,7 +60,7 @@ class QuizSerializer(serializers.ModelSerializer):
             'assigned_students', 'assigned_groups',
             'time_limit', 'is_published', 'category', 'questions',
             
-                 'start_time', 'end_time', 'is_active'
+                 'start_time', 'end_time', 'is_active','max_attempts'
         ]
 
     def create(self, validated_data):
@@ -111,14 +111,18 @@ class StudentQuizHistorySerializer(serializers.ModelSerializer):
     question_count = serializers.SerializerMethodField()
     answered_count = serializers.SerializerMethodField()
     percentage_score = serializers.SerializerMethodField()
+    max_attempts = serializers.IntegerField(source='quiz.max_attempts', read_only=True)
+    can_retake = serializers.SerializerMethodField()
     
     class Meta:
         model = Result
         fields = [
             'id', 'quiz_id', 'quiz_title', 'quiz_description',
             'score', 'max_score', 'percentage_score',
-            'question_count', 'answered_count', 'completed_at'
-        ]
+            'question_count', 'answered_count', 'completed_at',
+            'attempts_used', 'max_attempts', 'can_retake']
+    
+    
     
     def get_question_count(self, obj):
         return obj.quiz.questions.count()
@@ -135,6 +139,17 @@ class StudentQuizHistorySerializer(serializers.ModelSerializer):
 
 
         return 0
+    
+    def get_attempts_used(self, obj):
+        return QuizAttempt.objects.filter(
+            quiz=obj.quiz,
+            student=obj.student,
+            is_completed=True
+        ).count()
+    
+    def get_can_retake(self, obj):
+        attempts_used = self.get_attempts_used(obj)
+        return attempts_used < obj.quiz.max_attempts and obj.quiz.is_active
 class QuizResultDetailSerializer(serializers.ModelSerializer):
         percentage = serializers.SerializerMethodField()
     

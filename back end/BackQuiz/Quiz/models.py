@@ -39,6 +39,7 @@ class Quiz(models.Model):
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='math')
+    max_attempts = models.PositiveIntegerField(default=1, help_text="Maximum number of attempts allowed per student")
 
     
     @property
@@ -61,7 +62,19 @@ class Quiz(models.Model):
         # If both are set
         return self.start_time <= now <= self.end_time
 
-
+class QuizAttempt(models.Model):
+    quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='attempts')
+    student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='quiz_attempts')
+    attempt_number = models.PositiveIntegerField(default=1)
+    started_at = models.DateTimeField(auto_now_add=True)
+    completed_at = models.DateTimeField(null=True, blank=True)
+    is_completed = models.BooleanField(default=False)
+    
+    class Meta:
+        unique_together = ('quiz', 'student', 'attempt_number')
+        
+    def __str__(self):
+        return f"{self.student.username} - Attempt #{self.attempt_number} on {self.quiz.title}"
 
 class Question(models.Model):
     TYPE_CHOICES = (

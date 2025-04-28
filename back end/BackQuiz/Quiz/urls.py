@@ -8,7 +8,8 @@ from .views import (
     GroupListCreateView, GroupDetailView, StudentQuizHistoryView,
     # Student quiz views
     StudentQuizQuestionsView, StudentQuestionOptionsView,
-    StudentQuizResultDetailView
+    StudentQuizResultDetailView,
+    QuizSubmitView
 )
 
 urlpatterns = [
@@ -49,4 +50,5 @@ urlpatterns = [
         path('results/<int:pk>/detail/', StudentQuizResultDetailView.as_view(), name='student-quiz-result-detail'),
         # Add this to your urlpatterns
         path('quiz-history/', StudentQuizHistoryView.as_view(), name='student-quiz-history'),
+        path('quizzes/<int:quiz_id>/submit/', QuizSubmitView.as_view(), name='quiz-submit'),
     ]
