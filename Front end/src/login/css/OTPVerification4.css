@@ -1,5 +1,5 @@
 .botp-verification-backgroundody {
-  background-image: url('src/assets/Log in - Wrong pwd.png');
+  background-image: url("src/assets/Log in - Wrong pwd.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -25,20 +25,19 @@
   max-width: 400px;
   width: 100%;
   border-radius: 18px;
-  background: #FFF;
-  box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.08), 
-              0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.12), 
-              0px 24.347px 75.273px 0px rgba(0, 0, 0, 0.14), 
-              0px 13.648px 42.198px 0px rgba(0, 0, 0, 0.17), 
-              0px 7.249px 22.411px 0px rgba(0, 0, 0, 0.21), 
-              0px 3.016px 9.326px 0px rgba(0, 0, 0, 0.29);
+  background: #fff;
+  box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.08),
+    0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.12),
+    0px 24.347px 75.273px 0px rgba(0, 0, 0, 0.14),
+    0px 13.648px 42.198px 0px rgba(0, 0, 0, 0.17),
+    0px 7.249px 22.411px 0px rgba(0, 0, 0, 0.21),
+    0px 3.016px 9.326px 0px rgba(0, 0, 0, 0.29);
   padding: 2rem 2rem 3rem 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
 }
-
 
 .otp-verification-card h2 {
   color: #262626;
@@ -50,7 +49,7 @@
 }
 
 .otp-verification-card p {
-  color: #5D5D5D;
+  color: #5d5d5d;
   font-size: 14px;
   font-weight: 500;
   line-height: 150%;
@@ -77,17 +76,17 @@ form {
   width: 50px;
   height: 50px;
   border-radius: 8px;
-  border: 1px solid #E8ECF4;
-  background: #E9F6FE;
+  border: 1px solid #e8ecf4;
+  background: #e9f6fe;
   font-size: 24px;
   font-weight: 600;
   text-align: center;
-  color: #0A0404;
+  color: #0a0404;
 }
 
 .otp-inputs input:focus {
   outline: none;
-  border-color: #31BCE2;
+  border-color: #31bce2;
   box-shadow: 0 0 0 2px rgba(49, 188, 226, 0.2);
 }
 
@@ -105,7 +104,7 @@ form {
   justify-content: center;
   align-items: center;
   border-radius: 1.125rem;
-  background: linear-gradient(180deg, #31BCE2 0%, #0664AE 100%);
+  background: linear-gradient(180deg, #31bce2 0%, #0664ae 100%);
   color: white;
   border: none;
   font-size: 1rem;
@@ -126,13 +125,13 @@ form {
 }
 
 .resend-link span {
-  color: #5D5D5D;
+  color: #5d5d5d;
 }
 
 .resend-button {
   background: none;
   border: none;
-  color: #0664AE;
+  color: #0664ae;
   font-size: 14px;
   font-weight: 600;
   cursor: pointer;
@@ -156,7 +155,7 @@ form {
     max-width: 90%;
     padding: 2rem 1.5rem;
   }
-  
+
   .otp-inputs input {
     width: 40px;
     height: 40px;

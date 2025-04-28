@@ -2,12 +2,13 @@
 
 /* Scoped base styling */
 .quiz-app-container,
-.quiz-app-container html, 
+.quiz-app-container html,
 .quiz-app-container body {
   height: 100%;
   margin: 0;
   background-color: #f0f7ff;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen,
+    Ubuntu, Cantarell, sans-serif;
 }
 
 .quiz-app-container #root {
@@ -173,20 +174,24 @@
   .quiz-app-container .p-4 {
     padding: 1rem 0.75rem;
   }
-  
+
   .quiz-app-container button {
     padding-left: 0.75rem;
     padding-right: 0.75rem;
   }
-  
+
   .quiz-app-container .question-container {
     padding: 1rem 0.75rem;
   }
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 .quiz-app-container .fade-in {

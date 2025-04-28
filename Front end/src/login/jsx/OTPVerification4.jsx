@@ -45,23 +45,23 @@ const OTPVerification = () => {
   const handlePaste = (e) => {
     e.preventDefault();
     const pastedData = e.clipboardData.getData("text").trim();
-    
+
     // Check if pasted content contains only numbers
     if (!/^\d+$/.test(pastedData)) {
       return;
     }
-    
+
     const pastedChars = pastedData.slice(0, 4).split("");
     const newOtp = [...otp];
-    
+
     pastedChars.forEach((char, index) => {
       if (index < 4) {
         newOtp[index] = char;
       }
     });
-    
+
     setOtp(newOtp);
-    
+
     // Focus on the appropriate input after pasting
     if (pastedChars.length < 4 && inputRefs.current[pastedChars.length]) {
       inputRefs.current[pastedChars.length].focus();
@@ -70,65 +70,66 @@ const OTPVerification = () => {
 
   const handleVerify = (e) => {
     e.preventDefault();
-    
+
     // Check if OTP is complete
-    if (otp.some(digit => digit === "")) {
+    if (otp.some((digit) => digit === "")) {
       setError("Please enter the complete verification code");
       return;
     }
-    
+
     console.log("Verifying OTP:", otp.join(""));
     // Add your OTP verification logic here
   };
 
   const handleResend = () => {
     console.log("Resending OTP");
-    
+
     // Add your resend logic here
   };
 
   return (
     <div className="otp-verification-background">
-    <div className="otp-verification-container">
-      <div className="otp-verification-card">
-        
-        
-        <h2>OTP Verification</h2>
-        
-        <p>
-          Enter the verification code we just sent to your email address or phone number.
-        </p>
+      <div className="otp-verification-container">
+        <div className="otp-verification-card">
+          <h2>OTP Verification</h2>
 
-        <form onSubmit={handleVerify}>
-          <div className="otp-inputs">
-            {otp.map((digit, index) => (
-              <input
-                key={index}
-                ref={el => inputRefs.current[index] = el}
-                type="text"
-                maxLength="1"
-                value={digit}
-                onChange={e => handleChange(index, e.target.value)}
-                onKeyDown={e => handleKeyDown(index, e)}
-                onPaste={index === 0 ? handlePaste : null}
-                autoComplete="off"
-              />
-            ))}
+          <p>
+            Enter the verification code we just sent to your email address or
+            phone number.
+          </p>
+
+          <form onSubmit={handleVerify}>
+            <div className="otp-inputs">
+              {otp.map((digit, index) => (
+                <input
+                  key={index}
+                  ref={(el) => (inputRefs.current[index] = el)}
+                  type="text"
+                  maxLength="1"
+                  value={digit}
+                  onChange={(e) => handleChange(index, e.target.value)}
+                  onKeyDown={(e) => handleKeyDown(index, e)}
+                  onPaste={index === 0 ? handlePaste : null}
+                  autoComplete="off"
+                />
+              ))}
+            </div>
+
+            {error && <div className="error-message">{error}</div>}
+
+            <button type="submit" className="verify-button">
+              Verify
+            </button>
+          </form>
+
+          <div className="resend-link">
+            <span>Didn't receive a code? </span>
+            <button onClick={handleResend} className="resend-button">
+              Resend
+            </button>
           </div>
-
-          {error && <div className="error-message">{error}</div>}
-
-          <button type="submit" className="verify-button">
-            Verify
-          </button>
-        </form>
-
-        <div className="resend-link">
-          <span>Didn't receive a code? </span>
-          <button onClick={handleResend} className="resend-button">Resend</button>
         </div>
       </div>
-    </div>
     </div>
   );
 };
