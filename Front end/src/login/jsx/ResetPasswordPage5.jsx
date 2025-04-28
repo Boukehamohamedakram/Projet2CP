@@ -29,6 +29,7 @@ const CreateNewPassword = () => {
 
   if (success) {
     return (
+      
       <div className="password-reset-container">
         {/* Add your success image here - you'll need to import it first */}
         {
@@ -54,6 +55,7 @@ const CreateNewPassword = () => {
     );
   }
   return (
+    <div className="password-reset-background"> 
     <div className="password-reset-container">
       <h2>Create New Password</h2>
       <p>Your new password must be unique from these previously used.</p>
@@ -147,6 +149,7 @@ const CreateNewPassword = () => {
           Reset Password
         </button>
       </form>
+    </div>
     </div>
   );
 };
