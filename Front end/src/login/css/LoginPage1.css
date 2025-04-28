@@ -1,20 +1,7 @@
 /* QuizPILogin.css */
 
-body {
-  background-image: url('src/assets/Log in - Wrong pwd.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
-  margin: 0;
-  padding: 0;
-  min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 .login-page-container {
-  background-image: url('src/assets/Log in - Wrong pwd.png');
+  background-image: url("src/assets/Log in - Wrong pwd.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -34,16 +21,16 @@ body {
 }
 
 .login-card {
-  width: 100%;
+  width: 200%;
   max-width: 400px;
   border-radius: 18px;
-  background: #FFF;
-  box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.08), 
-              0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.12), 
-              0px 24.347px 75.273px 0px rgba(0, 0, 0, 0.14), 
-              0px 13.648px 42.198px 0px rgba(0, 0, 0, 0.17), 
-              0px 7.249px 22.411px 0px rgba(0, 0, 0, 0.21), 
-              0px 3.016px 9.326px 0px rgba(0, 0, 0, 0.29);
+  background: #fff;
+  box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.08),
+    0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.12),
+    0px 24.347px 75.273px 0px rgba(0, 0, 0, 0.14),
+    0px 13.648px 42.198px 0px rgba(0, 0, 0, 0.17),
+    0px 7.249px 22.411px 0px rgba(0, 0, 0, 0.21),
+    0px 3.016px 9.326px 0px rgba(0, 0, 0, 0.29);
   padding: 2.5rem;
   display: flex;
   flex-direction: column;
@@ -58,7 +45,7 @@ body {
 }
 
 .logo-icon {
-  color: #31BCE2;
+  color: #31bce2;
   margin-left: 1rem;
   margin-bottom: -2rem;
   width: 100%;
@@ -85,23 +72,23 @@ body {
   line-height: normal;
   letter-spacing: -0.09rem;
   text-transform: capitalize;
-  background: linear-gradient(180deg, #31BCE2 0%, #0664AE 100%);
+  background: linear-gradient(180deg, #31bce2 0%, #0664ae 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
-  color: #0664AE; /* fallback color if gradient isn't supported */
+  color: #0664ae; /* fallback color if gradient isn't supported */
 }
 
 @font-face {
-  font-family: 'Chalkboard SE';
-  src: url('src/assets/fonts/ChalkboardSE-Bold-03_0.ttf') format('truetype');
+  font-family: "Chalkboard SE";
+  src: url("src/assets/fonts/ChalkboardSE-Bold-03_0.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Georgia';
-  src: url('src/assets/fonts/georgia.ttf') format('truetype');
+  font-family: "Georgia";
+  src: url("src/assets/fonts/georgia.ttf") format("truetype");
   font-weight: normal;
   font-style: normal;
 }
@@ -118,19 +105,19 @@ body {
 
 .form-label {
   margin-bottom: 0.3rem;
-  color: #0A0404;
+  color: #0a0404;
   font-size: 13px;
   font-weight: 400;
   display: block;
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
 }
 
 .input-field {
   width: 100%;
   height: 2.25rem;
   border-radius: 1.125rem;
-  border: 1px solid #E8ECF4;
-  background: #E9F6FE;
+  border: 1px solid #e8ecf4;
+  background: #e9f6fe;
   padding: 0 1rem;
   box-sizing: border-box;
 }
@@ -141,7 +128,7 @@ body {
   border: none;
   background: transparent;
   font-size: 1rem;
-  color: #0A0404;
+  color: #0a0404;
   outline: none;
 }
 
@@ -152,8 +139,8 @@ body {
   width: 100%;
   height: 2.25rem;
   border-radius: 1.125rem;
-  border: 1px solid #E8ECF4;
-  background: #E9F6FE;
+  border: 1px solid #e8ecf4;
+  background: #e9f6fe;
 }
 
 .password-input-wrapper .input-control {
@@ -166,27 +153,27 @@ body {
   position: absolute;
   right: 1rem;
   cursor: pointer;
-  color: #0664AE;
+  color: #0664ae;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .toggle-password:hover {
-  color: #31BCE2;
+  color: #31bce2;
 }
 
-
 .forgot-password-link {
-  color: #5D5D5D;
-  font-size: 12px;
-  margin: -0.5rem 0 2rem 9rem;
+  color: #5d5d5d;
+  font-size: 0.85rem;
+  margin: -0.5rem 0 2rem 12rem;
 
   text-decoration: none;
-  font-family: 'Georgia', serif;
+  font-family: "Georgia", serif;
 }
 
 .forgot-password-link:hover {
+  color: #0664ae;
   text-decoration: underline;
 }
 
@@ -205,7 +192,7 @@ body {
   align-items: center;
   gap: 0.5rem;
   border-radius: 1.125rem;
-  background: linear-gradient(180deg, #31BCE2 0%, #0664AE 100%);
+  background: linear-gradient(180deg, #31bce2 0%, #0664ae 100%);
   color: white;
   border: none;
   font-size: 1rem;
@@ -218,7 +205,7 @@ body {
 }
 
 .register-prompt {
-  color: #5D5D5D;
+  color: #5d5d5d;
   font-size: 14px;
   font-weight: 500;
   text-align: center;
@@ -227,7 +214,7 @@ body {
 }
 
 .register-link {
-  color: #0664AE;
+  color: #0664ae;
   text-decoration: none;
 }
 
@@ -241,7 +228,7 @@ body {
     max-width: 360px;
     padding: 2rem 1.75rem;
   }
-  
+
   .logo-text {
     font-size: 2rem;
     height: 3rem;
@@ -254,28 +241,29 @@ body {
     padding: 1.5rem;
     border-radius: 12px;
   }
-  
+
   .logo-icon {
     margin-bottom: -1.75rem;
     max-width: 65px;
   }
-  
+
   .logo-text {
     font-size: 1.75rem;
     height: 2.5rem;
     width: 5.5rem;
   }
-  
+
   .login-button {
     padding: 0.5rem 0;
     font-size: 0.9rem;
   }
-  
+
   .form-label {
     font-size: 12px;
   }
-  
-  .input-field, .password-input-wrapper {
+
+  .input-field,
+  .password-input-wrapper {
     height: 2rem;
   }
 }
@@ -284,25 +272,25 @@ body {
   .login-card {
     padding: 1.25rem 1rem;
   }
-  
+
   .logo-icon {
     max-width: 55px;
     margin-bottom: -1.5rem;
   }
-  
+
   .logo-text {
     font-size: 1.5rem;
     height: 2.25rem;
   }
-  
+
   .form-group {
     margin-bottom: 0.75rem;
   }
-  
+
   .forgot-password-container {
     margin-bottom: 1rem;
   }
-  
+
   .forgot-password-link {
     font-size: 11px;
   }
@@ -314,23 +302,23 @@ body {
     align-items: flex-start;
     padding: 1rem 0;
   }
-  
+
   .login-card {
     padding: 1.25rem;
     max-height: 90vh;
     overflow-y: auto;
   }
-  
+
   .logo-icon {
     max-width: 50px;
     margin-bottom: -1.5rem;
   }
-  
+
   .logo-text {
     font-size: 1.5rem;
     height: 2rem;
   }
-  
+
   .form-group {
     margin-bottom: 0.75rem;
   }
@@ -339,14 +327,14 @@ body {
 /* For high-resolution displays */
 @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
   .login-page-container {
-    background-image: url('src/assets/Log in - Wrong pwd@2x.png');
+    background-image: url("src/assets/Log in - Wrong pwd@2x.png");
   }
 }
 
 /* Handle dark mode preferences */
 @media (prefers-color-scheme: dark) {
   .login-card {
-    box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.2), 
-                0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.25);
+    box-shadow: 0px 109px 337px 0px rgba(0, 0, 0, 0.2),
+      0px 45.538px 140.791px 0px rgba(0, 0, 0, 0.25);
   }
 }
