@@ -5,9 +5,10 @@ from .views import (
     OptionListCreateView, OptionDetailView,
     StudentAnswerListCreateView, StudentAnswerDetailView,
     ResultListView,
-    GroupListCreateView, GroupDetailView,
+    GroupListCreateView, GroupDetailView, StudentQuizHistoryView,
     # Student quiz views
-    StudentQuizQuestionsView, StudentQuestionOptionsView
+    StudentQuizQuestionsView, StudentQuestionOptionsView,
+    StudentQuizResultDetailView
 )
 
 urlpatterns = [
@@ -44,4 +45,8 @@ urlpatterns = [
         
         # Results URLs
         path('results/', ResultListView.as_view(), name='result-list'),
+        # Add this to your urlpatterns
+        path('results/<int:pk>/detail/', StudentQuizResultDetailView.as_view(), name='student-quiz-result-detail'),
+        # Add this to your urlpatterns
+        path('quiz-history/', StudentQuizHistoryView.as_view(), name='student-quiz-history'),
     ]

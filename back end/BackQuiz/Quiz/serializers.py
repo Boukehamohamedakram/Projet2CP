@@ -103,3 +103,47 @@ class ResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
         fields = ['id', 'quiz', 'student', 'score', 'completed_at']
+
+
+class StudentQuizHistorySerializer(serializers.ModelSerializer):
+    quiz_title = serializers.CharField(source='quiz.title', read_only=True)
+    quiz_description = serializers.CharField(source='quiz.description', read_only=True)
+    question_count = serializers.SerializerMethodField()
+    answered_count = serializers.SerializerMethodField()
+    percentage_score = serializers.SerializerMethodField()
+    
+    class Meta:
+        model = Result
+        fields = [
+            'id', 'quiz_id', 'quiz_title', 'quiz_description',
+            'score', 'max_score', 'percentage_score',
+            'question_count', 'answered_count', 'completed_at'
+        ]
+    
+    def get_question_count(self, obj):
+        return obj.quiz.questions.count()
+    
+    def get_answered_count(self, obj):
+        return StudentAnswer.objects.filter(
+            student=obj.student,
+            question__quiz=obj.quiz
+        ).count()
+    
+    def get_percentage_score(self, obj):
+        if obj.max_score > 0:
+            return round((obj.score / obj.max_score) * 100, 2)
+
+
+        return 0
+class QuizResultDetailSerializer(serializers.ModelSerializer):
+        percentage = serializers.SerializerMethodField()
+    
+        class Meta:
+            model = Result
+        fields = ['id', 'quiz', 'student', 'score', 'max_score', 
+                  'percentage', 'completed_at']
+    
+        def get_percentage(self, obj):
+            if obj.max_score > 0:
+                return round((obj.score / obj.max_score) * 100, 2)
+            return 0

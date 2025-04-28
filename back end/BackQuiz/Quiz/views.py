@@ -2,7 +2,7 @@ from rest_framework import generics, permissions, status
 from .models import Quiz, Question, Option, StudentAnswer, Result, Group
 from rest_framework.response import Response
 from django.contrib.auth import get_user_model
-from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer
+from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer, QuizResultDetailSerializer, StudentQuizHistorySerializer
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 
 # ✅ Quiz Views
@@ -116,11 +116,14 @@ class QuestionListCreateView(generics.ListCreateAPIView):
         return Question.objects.all()
 
     def create(self, request, *args, **kwargs):
-        # Extract options data from request
-        options_data = request.data.pop('options', [])
+        # Make a mutable copy of the request data
+        data = request.data.copy()
+        
+        # Extract options data from the copy
+        options_data = data.pop('options', [])
         
         # Create the question first
-        serializer = self.get_serializer(data=request.data)
+        serializer = self.get_serializer(data=data)
         serializer.is_valid(raise_exception=True)
         question = serializer.save()
         
@@ -208,7 +211,84 @@ class ResultListView(generics.ListAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStudent]
 
     def get_queryset(self):
-        return Result.objects.filter(student=self.request.user)  # Students only see their own results
+        return Result.objects.filter(student=self.request.user)  # Students only see 
+    
+class StudentQuizResultDetailView(generics.RetrieveAPIView):
+    serializer_class = QuizResultDetailSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        if hasattr(user, 'is_teacher') and user.is_teacher:
+            return Result.objects.all()
+        return Result.objects.filter(student=user)
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+
+        # Check if the user has permission to view this result
+        if not request.user.is_teacher and instance.student != request.user:
+            return Response({"error": "You do not have permission to view this result."},
+                            status=status.HTTP_403_FORBIDDEN)
+
+        # Get all questions in the quiz
+        questions = Question.objects.filter(quiz=instance.quiz)
+
+        # Get all answers submitted by the student for this quiz
+        answers = StudentAnswer.objects.filter(
+            student=instance.student,
+            question__quiz=instance.quiz
+        )
+
+        # Format detailed question results
+        question_results = []
+        for question in questions:
+            try:
+                answer = answers.get(question=question)
+                answer_data = {
+                    'question_id': question.id,
+                    'question_text': question.text,
+                    'question_type': question.question_type,
+                    'points_possible': question.points,
+                    'points_earned': answer.earned_points,
+                }
+
+                # Add selected option details
+                if answer.selected_option:
+                    answer_data.update({
+                        'selected_option_id': answer.selected_option.id,
+                        'selected_option_text': answer.selected_option.text,
+                        'is_correct': answer.selected_option.is_correct
+                    })
+                # Add text answer if applicable
+                elif answer.text_answer:
+                    answer_data.update({
+                        'text_answer': answer.text_answer,
+                        'is_graded': answer.earned_points > 0
+                    })
+
+                question_results.append(answer_data)
+
+            except StudentAnswer.DoesNotExist:
+                # Question wasn't answered
+                question_results.append({
+                    'question_id': question.id,
+                    'question_text': question.text,
+                    'question_type': question.question_type,
+                    'points_possible': question.points,
+                    'points_earned': 0,
+                    'status': 'Not answered'
+                })
+
+        # Get the serialized result data
+        serializer = self.get_serializer(instance)
+        data = serializer.data
+
+        # Add the detailed question results
+        data['question_results'] = question_results
+        data['quiz_title'] = instance.quiz.title
+
+        return Response(data)
 
 # ✅ Group Views (for Teachers)
 class GroupListCreateView(generics.ListCreateAPIView):
@@ -227,3 +307,28 @@ class GroupDetailView(generics.RetrieveUpdateDestroyAPIView):
 
     def get_queryset(self):
         return Group.objects.filter(teacher=self.request.user)
+    
+
+
+class StudentQuizHistoryView(generics.ListAPIView):
+    """
+    View for students to see their history of completed quizzes with results.
+    This endpoint returns all quizzes the student has submitted answers for, 
+    along with their scores and completion date.
+    """
+    serializer_class = StudentQuizHistorySerializer
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
+    
+    def get_queryset(self):
+        student = self.request.user
+        
+        # Get all quizzes where the student has submitted at least one answer
+        answered_quiz_ids = StudentAnswer.objects.filter(
+            student=student
+        ).values_list('question__quiz', flat=True).distinct()
+        
+        # Get results for these quizzes
+        return Result.objects.filter(
+            student=student,
+            quiz_id__in=answered_quiz_ids
+        ).select_related('quiz').order_by('-completed_at')
