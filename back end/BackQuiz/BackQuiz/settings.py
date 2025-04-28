@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'rest_framework.authtoken',
     'rest_framework',
     'rest_framework_simplejwt',
+    
 
     # Your apps
     'users',
@@ -74,6 +75,9 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+
+# yakoub add
+     'corsheaders.middleware.CorsMiddleware',
 ]
 
 ROOT_URLCONF = 'BackQuiz.urls'
@@ -147,4 +151,9 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+
+# yakoub add
+CORS_ALLOW_ALL_ORIGINS = True  # for testing (don't use in production)
 

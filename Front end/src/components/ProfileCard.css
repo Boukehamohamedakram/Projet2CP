@@ -1,0 +1,104 @@
+.profile-card {
+  max-width: 800px;
+  margin: 1rem auto;
+  padding: 1.5rem;
+  background: #64a8da;
+  border-radius: 12px;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  grid-template-rows: auto auto;
+  grid-template-areas:
+    "avatar details"
+    "actions actions";
+  gap: 1rem;
+}
+
+.profile-avatar {
+  grid-area: avatar;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.profile-avatar img {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+.profile-details {
+  grid-area: details;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.profile-details .detail {
+  display: flex;
+}
+.profile-details .label {
+  font-weight: bold;
+  min-width: 100px;
+  color: #fff;
+}
+.profile-details .value {
+  color: #f0f8ff;
+  margin-left: 0.5rem;
+}
+
+.profile-actions {
+  grid-area: actions;
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 1rem;
+}
+
+.btn-outline,
+.btn-solid {
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid #f0f8ff;
+  color: #f0f8ff;
+}
+
+.btn-outline:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-solid {
+  background: #fff;
+  border: none;
+  color: #64a8da;
+}
+
+.btn-solid:hover {
+  opacity: 0.9;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  .profile-card {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "avatar"
+      "details"
+      "actions";
+    text-align: center;
+  }
+  .profile-details .detail {
+    justify-content: center;
+  }
+  .profile-details .label {
+    min-width: auto;
+  }
+  .profile-actions {
+    justify-content: center;
+  }
+}
