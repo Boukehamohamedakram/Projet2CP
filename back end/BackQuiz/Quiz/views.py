@@ -170,20 +170,13 @@ class QuizSubmitView(generics.GenericAPIView):
                     status=status.HTTP_403_FORBIDDEN
                 )
             
-            # Get the current attempt
-            try:
-                current_attempt = QuizAttempt.objects.get(
-                    quiz=quiz,
-                    student=student,
-                    is_completed=False
-                )
-            except QuizAttempt.DoesNotExist:
-                # Create a new attempt if none exists
-                current_attempt = QuizAttempt.objects.create(
-                    quiz=quiz,
-                    student=student,
-                    attempt_number=attempts_count + 1
-                )
+            # Get or create the current attempt
+            current_attempt, created = QuizAttempt.objects.get_or_create(
+                quiz=quiz,
+                student=student,
+                is_completed=False,
+                defaults={'attempt_number': attempts_count + 1}
+            )
             
             # Mark current attempt as completed
             current_attempt.is_completed = True
@@ -193,7 +186,8 @@ class QuizSubmitView(generics.GenericAPIView):
             # Calculate score for this attempt
             result, created = Result.objects.get_or_create(
                 quiz=quiz,
-                student=student
+                student=student,
+                defaults={'score': 0, 'max_score': quiz.questions.aggregate(total_points=models.Sum('points'))['total_points']}
             )
             result.calculate_score()
             
@@ -211,6 +205,7 @@ class QuizSubmitView(generics.GenericAPIView):
                 {"error": "Quiz not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
+
 class QuestionListCreateView(generics.ListCreateAPIView):
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacher]  # Teacher only
