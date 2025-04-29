@@ -342,12 +342,6 @@ class StudentQuizResultDetailView(generics.RetrieveAPIView):
     serializer_class = QuizResultDetailSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-    def get_queryset(self):
-        user = self.request.user
-        if hasattr(user, 'is_teacher') and user.is_teacher:
-            return Result.objects.all()
-        return Result.objects.filter(student=user)
-
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
 
@@ -356,13 +350,28 @@ class StudentQuizResultDetailView(generics.RetrieveAPIView):
             return Response({"error": "You do not have permission to view this result."},
                             status=status.HTTP_403_FORBIDDEN)
 
+        # Check if the quiz time has ended or max attempts are reached
+        quiz = instance.quiz
+        current_time = timezone.now()
+        attempts_used = QuizAttempt.objects.filter(
+            quiz=quiz,
+            student=instance.student,
+            is_completed=True
+        ).count()
+
+        if current_time < quiz.end_time and attempts_used < quiz.max_attempts:
+            return Response(
+                {"message": "The solution is not available yet. You can still attempt the quiz."},
+                status=status.HTTP_403_FORBIDDEN
+            )
+
         # Get all questions in the quiz
-        questions = Question.objects.filter(quiz=instance.quiz)
+        questions = Question.objects.filter(quiz=quiz)
 
         # Get all answers submitted by the student for this quiz
         answers = StudentAnswer.objects.filter(
             student=instance.student,
-            question__quiz=instance.quiz
+            question__quiz=quiz
         )
 
         # Format detailed question results
@@ -377,7 +386,6 @@ class StudentQuizResultDetailView(generics.RetrieveAPIView):
                     'points_possible': question.points,
                     'points_earned': answer.earned_points,
                 }
-
                 # Add selected option details
                 if answer.selected_option:
                     answer_data.update({
@@ -411,7 +419,7 @@ class StudentQuizResultDetailView(generics.RetrieveAPIView):
 
         # Add the detailed question results
         data['question_results'] = question_results
-        data['quiz_title'] = instance.quiz.title
+        data['quiz_title'] = quiz.title
 
         return Response(data)
 
