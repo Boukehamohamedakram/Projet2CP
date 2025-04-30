@@ -21,7 +21,7 @@ function App() {
         <Route path="/quizzes" element={<Quizzes />} />
         <Route path="/change-user-info" element={<ChangeUserInfo />} />
         <Route path="/dashboard" element={<GeneralStatistics/>} />
-        <Route path="/quizstatistics" element={<QuizStatistics />} />
+        <Route path="/quiz-statistics/:id" element={<QuizStatistics />} />
       </Routes>
     </BrowserRouter>
   );

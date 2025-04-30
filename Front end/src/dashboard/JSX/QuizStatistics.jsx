@@ -1,66 +1,105 @@
-import { useNavigate } from "react-router-dom";
+import { useState, useEffect } from "react";
+import { useNavigate, useParams } from "react-router-dom";
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import "../CSS/QuizStatistics.css"; 
 
 function QuizStatistics() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  
+  // Add state for quiz data
+  const [quizData, setQuizData] = useState({
+    title: '',
+    topStudents: [],
+    absentStudents: [],
+    badQuestions: [],
+    gradeDistribution: [],
+    average: 0,
+    completionRate: 0
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
+  useEffect(() => {
+    const fetchQuizStatistics = async () => {
+      try {
+        if (!id) {
+          throw new Error('Quiz ID not provided');
+        }
+
+        const userData = JSON.parse(localStorage.getItem('userData'));
+        if (!userData?.token) {
+          navigate('/login');
+          return;
+        }
+
+        // Updated endpoint to match Django URL structure
+        const response = await fetch(`http://localhost:8000/api/Quiz/results/${id}/`, {
+          headers: {
+            'Authorization': `Token ${userData.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!response.ok) {
+          const errorText = await response.text();
+          console.error('API Error:', {
+            status: response.status,
+            statusText: response.statusText,
+            body: errorText,
+            endpoint: `http://localhost:8000/api/Quiz/results/${id}/`
+          });
+          throw new Error(`Failed to fetch quiz statistics: ${response.status}`);
+        }
+
+        const data = await response.json();
+        console.log('Quiz statistics data:', data);
+
+        setQuizData({
+          title: data.title || 'Quiz Results',
+          topStudents: data.top_students || [],
+          absentStudents: data.absent_students || [],
+          badQuestions: data.bad_questions || [],
+          gradeDistribution: data.grade_distribution || [],
+          average: data.average || 0,
+          completionRate: data.completion_rate || 0
+        });
+
+      } catch (err) {
+        console.error('Detailed error:', err);
+        setError(err.message);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchQuizStatistics();
+  }, [id, navigate]);
+
+  // Handle loading state
+  if (loading) {
+    return <div className="quiz-statistics">
+      <div className="loading">Loading quiz statistics...</div>
+    </div>;
+  }
+
+  // Handle error state
+  if (error) {
+    return <div className="quiz-statistics">
+      <div className="error">
+        {error}
+        <button onClick={() => navigate('/dashboard')} className="back-button">
+          Back to Dashboard
+        </button>
+      </div>
+    </div>;
+  }
+
+  // Rest of your rendering code...
   return (
     <div className="quiz-statistics">
-      <h1 className="title">Quiz Statistics</h1>
-
-      <div className="grid">
-        {/* Top Students */}
-        <div className="card">
-          <h2 className="card-title">Top Students</h2>
-          <div className="card-content">
-            {[
-              { name: "Benarmas", group: "B05", mark: "15.25" },
-              { name: "Amirouche", group: "B04", mark: "14.75" },
-              { name: "Souilah", group: "B02", mark: "14.20" },
-              { name: "Zerari", group: "B01", mark: "13.90" },
-              { name: "Bouzid", group: "B03", mark: "13.50" },
-              { name: "Benkahla", group: "B06", mark: "13.00" },
-            ].map((student, idx) => (
-              <div key={idx} className="item">
-                <div className="item-text">{student.name}</div>
-                <div className="item-text">{student.group}</div>
-                <div className="item-percentage">{student.mark}</div> {/* ✅ use mark instead of button */}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Right Column */}
-        <div className="right-column">
-          {/* Bad Performance Questions */}
-          <div className="card">
-            <h2 className="card-title">Bad Performance Questions</h2>
-            <div className="card-content">
-              {[60, 68, 72].map((percentage, idx) => (
-                <div key={idx} className="item">
-                  <div className="item-text">Question : ............ ?</div>
-                  <div className="item-percentage">{percentage} %</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Important Statistics */}
-          <div className="card">
-            <h2 className="card-title">Important Statistics</h2>
-            <div className="card-content">
-              <div className="item">
-                <div className="item-text">Average :</div>
-                <div className="item-percentage">12.78</div>
-              </div>
-              <div className="item">
-                <div className="item-text">Completion rate :</div>
-                <div className="item-percentage">68 %</div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
+      <h1 className="title">{quizData.title}</h1>
+      {/* ... existing JSX using quizData instead of hardcoded values ... */}
     </div>
   );
 }
