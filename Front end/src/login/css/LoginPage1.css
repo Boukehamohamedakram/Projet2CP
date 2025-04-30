@@ -1,7 +1,7 @@
 /* QuizPILogin.css */
 
 .login-page-container {
-  background-image: url("src/assets/Log in - Wrong pwd.png");
+  background-image: url("src/assets/login.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;

@@ -1,0 +1,40 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import './NavBar.css';
+
+import logo from '../assets/Vector.png';
+import userAvatar from '../assets/Avatar.png';
+
+/**
+ * Safely parse a JWT and return its payload object,
+ * or null if parsing fails.
+ */
+
+
+export default function NavBar() {
+  const userName = localStorage.getItem('userName') || 'user_name';
+
+
+  return (
+    <nav className="quizpi-navbar">
+      <div className="quizpi-navbar__logo">
+        <img src={logo} alt="Logo" />
+      </div>
+
+      <ul className="quizpi-navbar__links">
+        <li><Link to="/home">HOME</Link></li>
+        <li><Link to="/dashboard">DASHBOARD</Link></li>
+        <li><Link to="/student">STUDENT</Link></li>
+      </ul>
+
+      <Link to="/parameters" className="quizpi-navbar__profile">
+        <span className="quizpi-navbar__username">{userName}</span>
+        <img
+          className="quizpi-navbar__avatar"
+          src={userAvatar}
+          alt={`${userName} avatar`}
+        />
+      </Link>
+    </nav>
+  );
+}
