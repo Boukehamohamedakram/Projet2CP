@@ -6,6 +6,7 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer, QuizResultDetailSerializer, StudentQuizHistorySerializer
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
+from rest_framework.views import APIView
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -465,3 +466,24 @@ class StudentQuizHistoryView(generics.ListAPIView):
             student=student,
             quiz_id__in=answered_quiz_ids
         ).select_related('quiz').order_by('-completed_at')
+
+class AbsentStudentsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def get(self, request, quiz_id):
+        try:
+            quiz = Quiz.objects.get(pk=quiz_id)
+            absent_students = Result.objects.filter(quiz=quiz, is_absent=True).select_related('student')
+
+            data = [
+                {
+                    "id": result.student.id,
+                    "username": result.student.username,
+                    "email": result.student.email,
+                }
+                for result in absent_students
+            ]
+
+            return Response({"absent_students": data}, status=200)
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found."}, status=404)
