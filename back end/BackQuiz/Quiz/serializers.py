@@ -1,6 +1,8 @@
-from rest_framework import serializers
+from rest_framework import serializers, generics, permissions
 from .models import Quiz, Question, Option, StudentAnswer, Result, Group, User, QuizAttempt
 from django.contrib.auth import get_user_model
+from django.db import models
+from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 User = get_user_model()  # ✅ Fetch the actual User model dynamically
 
 
@@ -67,33 +69,28 @@ class QuizSerializer(serializers.ModelSerializer):
         # Extract assigned students and groups from the request
         assigned_students = validated_data.pop('assigned_students', [])
         assigned_groups = validated_data.pop('assigned_groups', [])
-        
+
         # Create the quiz instance
         quiz = Quiz.objects.create(**validated_data)
 
-        # Manually set assigned students and groups (no auto-adding group members)
+        # Manually set assigned students and groups
         quiz.assigned_students.set(assigned_students)
         quiz.assigned_groups.set(assigned_groups)
 
         return quiz
 
     def update(self, instance, validated_data):
-        # Extract assigned students and groups from the request
-        assigned_students = validated_data.pop('assigned_students', None)
-        assigned_groups = validated_data.pop('assigned_groups', None)
-
-        # Update quiz attributes
+        # Update fields directly
         for attr, value in validated_data.items():
-            setattr(instance, attr, value)
-
-        # Manually update assigned students and groups (no auto-adding group members)
-        if assigned_students is not None:
-            instance.assigned_students.set(assigned_students)
-        if assigned_groups is not None:
-            instance.assigned_groups.set(assigned_groups)
-
+            if attr == 'assigned_students':
+                instance.assigned_students.set(value)  # Use .set() for ManyToManyField
+            elif attr == 'assigned_groups':
+                instance.assigned_groups.set(value)  # Use .set() for ManyToManyField
+            else:
+                setattr(instance, attr, value)
         instance.save()
         return instance
+
 class StudentAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentAnswer
@@ -162,3 +159,31 @@ class QuizResultDetailSerializer(serializers.ModelSerializer):
             if obj.max_score > 0:
                 return round((obj.score / obj.max_score) * 100, 2)
             return 0
+
+
+class AssignedQuizListView(generics.ListAPIView):
+    serializer_class = QuizSerializer
+    permission_classes = [permissions.IsAuthenticated, IsStudent]
+
+    def get_queryset(self):
+        student = self.request.user
+
+        # Get all quizzes assigned to the student
+        assigned_quizzes = Quiz.objects.filter(
+            models.Q(assigned_students=student) | 
+            models.Q(assigned_groups__students=student)
+        ).distinct()
+
+        # Filter out quizzes where the student has used all attempts
+        available_quizzes = []
+        for quiz in assigned_quizzes:
+            attempts_count = QuizAttempt.objects.filter(
+                quiz=quiz,
+                student=student,
+                is_completed=True
+            ).count()
+
+            if attempts_count < quiz.max_attempts and quiz.is_active:
+                available_quizzes.append(quiz.id)
+
+        return Quiz.objects.filter(id__in=available_quizzes)
