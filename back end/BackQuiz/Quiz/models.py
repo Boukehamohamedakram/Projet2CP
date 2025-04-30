@@ -112,9 +112,10 @@ class Result(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    max_score = models.DecimalField(max_digits=5, decimal_places=2, default=0)  # Total possible points
+    max_score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     completed_at = models.DateTimeField(auto_now=True)
-    
+    is_absent = models.BooleanField(default=False)  # Field to track absentees
+
     class Meta:
         unique_together = ('quiz', 'student')
         

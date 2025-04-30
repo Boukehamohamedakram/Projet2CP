@@ -9,7 +9,8 @@ from .views import (
     # Student quiz views
     StudentQuizQuestionsView, StudentQuestionOptionsView,
     StudentQuizResultDetailView,
-    QuizSubmitView
+    QuizSubmitView,
+    AbsentStudentsView
 )
 
 urlpatterns = [
@@ -51,4 +52,7 @@ urlpatterns = [
         # Add this to your urlpatterns
         path('quiz-history/', StudentQuizHistoryView.as_view(), name='student-quiz-history'),
         path('quizzes/<int:quiz_id>/submit/', QuizSubmitView.as_view(), name='quiz-submit'),
+        
+        # Absent students URL
+        path('quizzes/<int:quiz_id>/absent-students/', AbsentStudentsView.as_view(), name='absent-students'),
     ]
