@@ -343,6 +343,7 @@ class ResultListView(generics.ListAPIView):
 
     def get_queryset(self):
         return Result.objects.filter(student=self.request.user)  # Students only see 
+
     
 class StudentQuizResultDetailView(generics.RetrieveAPIView):
     serializer_class = QuizResultDetailSerializer
@@ -493,6 +494,7 @@ class AbsentStudentsView(APIView):
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=404)
 
+
 class QuizAnalyticsView(APIView):
     permission_classes = [permissions.IsAuthenticated, IsTeacher]
 
@@ -554,3 +556,4 @@ class QuizAnalyticsView(APIView):
 
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=404)
+
