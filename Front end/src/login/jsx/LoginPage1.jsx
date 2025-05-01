@@ -26,25 +26,12 @@ export default function LoginPage() {
         const data = await response.json();
         console.log("Login successful:", data);
         
-        // Store complete user data
-        const userData = {
-          token: data.token,
-          id: data.id,
-          username: data.username,
-          role: data.role,
-          email: data.email
-        };
-        
-        // Store both token and userData
+        // Store token and userId
         localStorage.setItem("token", data.token);
-        localStorage.setItem("userData", JSON.stringify(userData));
+        localStorage.setItem("userId", data.id.toString());
         
-        // Navigate based on role
-        if (data.role === 'teacher') {
-          navigate('/home');
-        } else if (data.role === 'student') {
-          navigate('/student-dashboard');
-        }
+        // Redirect to home page using navigate
+        navigate('/home');
       } else {
         const errorData = await response.json();
         console.error("Login failed:", errorData);
@@ -107,33 +94,45 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="login-form">
           <div className="form-group">
-            <label className="form-label">Enter your username:</label>
+            <label htmlFor="username" className="form-label">
+              Enter your username:
+            </label>
             <div className="input-field">
               <input
+                id="username"
+                name="username"
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
                 className="input-control"
                 placeholder="johndoe123"
+                autoComplete="username"
               />
             </div>
           </div>
 
           <div className="form-group">
-            <label className="form-label">Enter your Password:</label>
+            <label htmlFor="password" className="form-label">
+              Enter your Password:
+            </label>
             <div className="password-input-wrapper">
               <input
+                id="password"
+                name="password"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
                 className="input-control"
                 placeholder="••••••••"
+                autoComplete="current-password"
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
                 className="toggle-password"
+                role="button"
+                tabIndex={0}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (

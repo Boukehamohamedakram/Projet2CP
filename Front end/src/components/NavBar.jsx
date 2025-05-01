@@ -5,16 +5,7 @@ import './NavBar.css';
 import logo from '../assets/Vector.png';
 import userAvatar from '../assets/Avatar.png';
 
-/**
- * Safely parse a JWT and return its payload object,
- * or null if parsing fails.
- */
-
-
 export default function NavBar() {
-  const userName = localStorage.getItem('userName') || 'user_name';
-
-
   return (
     <nav className="quizpi-navbar">
       <div className="quizpi-navbar__logo">
@@ -28,11 +19,11 @@ export default function NavBar() {
       </ul>
 
       <Link to="/parameters" className="quizpi-navbar__profile">
-        <span className="quizpi-navbar__username">{userName}</span>
+        <span className="quizpi-navbar__username">Settings</span>
         <img
           className="quizpi-navbar__avatar"
           src={userAvatar}
-          alt={`${userName} avatar`}
+          alt="Settings avatar"
         />
       </Link>
     </nav>

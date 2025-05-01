@@ -22,6 +22,7 @@ function App() {
       <Routes>
         <Route path="/" element={<LoginPage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/home" element={<Home />} />
         <Route path="/forgot-password" element={<ForgotPassword3 />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
@@ -31,7 +32,6 @@ function App() {
         <Route path="/quiz-statistics" element={<QuizStatistics />} />
         <Route path="/navbar" element={<NavBar />} />
         <Route path="/footer" element={<Footer />} />
-        <Route path="/home" element={<Home />} />
         <Route path="/scheduled" element={<Scheduled />} />
         <Route path="/history" element={<History />} />
         <Route path="/programmed" element={<Programmed />} />

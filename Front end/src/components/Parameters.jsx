@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import NavBar from './NavBar';
 import Footer from './Footer';
 import './Parameters.css';
@@ -6,21 +6,57 @@ import defaultAvatar from '../assets/Avatar.png';
 import successIcon from '../assets/success-icon.png';
 
 export default function Parameters() {
-  const userName = localStorage.getItem('userName') || 'user_name';
-
-  const [view, setView] = useState('default');
   const [profile, setProfile] = useState({
-    fullName: "Chachoua Ali",
-    email: "ali@example.com",
-    grade: "12",
-    module: "Mathematics",
+    fullName: "Loading...",
+    email: "Loading...",
     avatar: defaultAvatar,
   });
+  const [view, setView] = useState('default');
   const [passwords, setPasswords] = useState({
     current: '',
     new1: '',
     new2: ''
   });
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      try {
+        const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
+        
+        if (!token) {
+          window.location.href = '/login';
+          return;
+        }
+
+        const response = await fetch('http://localhost:8000/api/users/users/', {
+          headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (response.ok) {
+          const users = await response.json();
+          const currentUser = users.find(user => user.id === parseInt(userId));
+          
+          if (currentUser) {
+            setProfile(prev => ({
+              ...prev,
+              fullName: currentUser.username,
+              email: currentUser.email || 'No email provided'
+            }));
+          }
+        } else {
+          console.error('Failed to fetch user data:', response.status);
+        }
+      } catch (error) {
+        console.error('Error fetching user data:', error);
+      }
+    };
+
+    fetchUserData();
+  }, []);
 
   const handleUpload = e => {
     const file = e.target.files[0];
@@ -39,7 +75,7 @@ export default function Parameters() {
       <NavBar />
       <main className="parameters-main">
         <h1 className="parameters-heading">☀️ GOOD MORNING</h1>
-        <h2 className="parameters-username">{userName}</h2>
+        <h2 className="parameters-username">{profile.fullName}</h2>
 
         {view === 'default' && (
           <div className="parameters-card">
@@ -66,8 +102,6 @@ export default function Parameters() {
               <div className="parameters-info">
                 <p>Full name: <strong>{profile.fullName}</strong></p>
                 <p>Email: <strong>{profile.email}</strong></p>
-                <p>Grade: <strong>{profile.grade}</strong></p>
-                <p>Module: <strong>{profile.module}</strong></p>
               </div>
               <div className="parameters-upload">
                 <label className="upload-label">

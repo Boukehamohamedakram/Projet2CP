@@ -17,21 +17,13 @@
 .programmed-filter-search {
   display: flex;
   align-items: center;
-  width: 100%;
-  max-width: 600px;
-  background: #fff;
-  padding: 0 12px;
-  height: 40px;
-  border-radius: 20px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-  margin-top: 8px;
-  margin-bottom: 16px;
+  gap: 10px;
+  margin-bottom: 20px;
 }
 
 .ps-icon {
   width: 20px;
   height: 20px;
-  margin-right: 8px;
 }
 
 .ps-filter {
@@ -52,11 +44,15 @@
 
 .ps-input {
   flex: 1;
-  border: none;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.ps-input:focus {
   outline: none;
-  font-size: 1rem;
-  color: #666;
-  padding: 0;
+  border-color: #4da8f7;
 }
 
 /* List of cards */
@@ -97,14 +93,38 @@
   color: #333;
   padding: 4px 8px;
   border-radius: 12px;
-  white-space: nowrap;
+  font-size: 0.9rem;
 }
 
-.card-date {
+select.card-category {
+  border: 1px solid #e0e0e0;
+  background: white;
+  cursor: pointer;
+  padding: 4px 24px 4px 8px;
+  appearance: none;
+}
+
+select.card-category:focus {
+  outline: none;
+  border-color: #4da8f7;
+  box-shadow: 0 0 0 2px rgba(77, 168, 247, 0.2);
+}
+
+.card-date,
+.card-time {
   background: #f0f0f0;
   padding: 4px 8px;
   border-radius: 12px;
   white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+/* Delete the combined datetime holder */
+.card-datetime {
+  display: none;
 }
 
 /* Delete & Modify buttons */
@@ -182,9 +202,12 @@
     font-size: 0.95rem;
   }
   .card-category,
+  .card-datetime {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
   .card-date,
-  .card-delete,
-  .card-modify {
+  .card-time {
     font-size: 0.75rem;
     padding: 4px 8px;
   }

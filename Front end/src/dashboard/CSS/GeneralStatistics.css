@@ -21,9 +21,36 @@
 
 .card {
   background: white;
-  border-radius: 10px;
+  border-radius: 8px;
+  padding: 20px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  padding: 1.5rem;
+  margin: 10px;
+}
+
+.card-content {
+  max-height: 500px;
+  overflow-y: auto;
+  transition: max-height 0.3s ease;
+}
+
+.groups-card .card-content {
+  min-height: 100px;
+  max-height: none;
+  height: auto;
+}
+
+.groups-card.empty .card-content {
+  height: 100px;
+}
+
+.groups-card.few-items .card-content {
+  height: auto;
+  max-height: 300px;
+}
+
+.groups-card.many-items .card-content {
+  height: auto;
+  max-height: 500px;
 }
 
 .card-title {
@@ -32,12 +59,6 @@
   margin-bottom: 1.5rem;
   padding-bottom: 0.5rem;
   border-bottom: 2px solid #e1e8ed;
-}
-
-.card-content {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
 }
 
 .item {
@@ -63,6 +84,26 @@
 .item-text strong {
   color: #0e87c1;
   font-size: 1.1rem;
+}
+
+.item-dates {
+  display: flex;
+  justify-content: center;  /* Center horizontally */
+  align-items: center;      /* Center vertically */
+  gap: 12px;
+  margin: 8px 0;           /* Increased margin for better spacing */
+}
+
+.item-date,
+.item-time {
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  font-size: 0.9rem;
+  color: #666;
+  text-align: center;      /* Center text inside each element */
+  min-width: 100px;        /* Give consistent width */
 }
 
 .loading {
@@ -96,4 +137,23 @@
 
 .item-button:hover {
   background-color: #0a6998;
+}
+
+.search-container {
+  padding: 0 16px 10px 16px;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #4da8f7;
+  box-shadow: 0 2px 4px rgba(77, 168, 247, 0.1);
 }

@@ -4,108 +4,141 @@ import NavBar from "./NavBar";
 import Footer from "./Footer";
 import "./History.css";
 
+const API = import.meta.env.VITE_API_URL;
+
+const isPastDateTime = (dateTimeStr) => {
+  if (!dateTimeStr) return false;
+  const quizDateTime = new Date(dateTimeStr);
+  const now = new Date();
+  return quizDateTime < now;
+};
+
 export default function History() {
   const navigate = useNavigate();
   const [quizzes, setQuizzes] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   useEffect(() => {
-    async function loadQuizzes() {
+    const fetchFinishedQuizzes = async () => {
       setLoading(true);
       try {
-        // 1) Get your saved JWT
-        const token = localStorage.getItem("token");
-        
-        // Check if token exists
-        if (!token) {
-          console.log("No token found, redirecting to login");
-          navigate("/login");
+        const userDataString = localStorage.getItem('userData');
+        if (!userDataString) {
+          navigate('/login');
           return;
         }
 
-        // 2) Read your Vite env var
-        const API = import.meta.env.VITE_API_URL || "http://localhost:8000";
-        
-        console.log("Attempting to fetch quizzes with token:", token.substring(0, 15) + "...");
-        
-        // 3) Fetch with Authorization header
-        const res = await fetch(`${API}/api/Quiz/quizzes/`, {
+        const userData = JSON.parse(userDataString);
+        if (!userData.token) {
+          throw new Error('Authentication token not found');
+        }
+
+        // Check if user is a teacher
+        if (userData.role !== 'teacher') {
+          throw new Error('Only teachers can view quiz history');
+        }
+
+        const response = await fetch(`${API}/api/Quiz/quizzes/`, {
           method: "GET",
           headers: {
             "Content-Type": "application/json",
-            "Authorization": `Bearer ${token}`
-          },
+            "Authorization": `Token ${userData.token}`
+          }
         });
 
-        if (res.status === 401) {
-          console.log("Token expired or invalid, redirecting to login");
-          localStorage.removeItem("token"); // Clear invalid token
-          navigate("/login");
-          return;
+        if (!response.ok) {
+          throw new Error(`Failed to fetch quizzes: ${response.status}`);
         }
 
-        if (!res.ok) {
-          throw new Error(`Server returned ${res.status}: ${await res.text()}`);
-        }
-
-        const data = await res.json();
-        console.log("Quizzes fetched successfully:", data.length);
-        
-        // 4) Map the data into the fields you want
-        setQuizzes(
-          data.map((q) => ({
-            id: q.id,
-            title: q.title,
-            category: q.category,
-            isActive: q.is_active,
-            questions: q.questions.length,
-            maxAttempts: q.max_attempts,
-            timeLimit: q.time_limit,
-          }))
+        const data = await response.json();
+        // Filter only finished quizzes (with past start_time)
+        const finishedQuizzes = data.filter(quiz => 
+          quiz.start_time && isPastDateTime(quiz.start_time)
         );
+        setQuizzes(finishedQuizzes);
+        setError(null);
+
       } catch (err) {
-        console.error("Error loading quizzes:", err);
+        console.error("Quiz history error:", err);
         setError(err.message);
-        
-        // Check if error might be auth-related
-        if (err.message.includes("401")) {
-          localStorage.removeItem("token"); // Clear potentially invalid token
-          navigate("/login");
-        }
       } finally {
         setLoading(false);
       }
-    }
-    
-    loadQuizzes();
+    };
+
+    fetchFinishedQuizzes();
   }, [navigate]);
 
-  if (loading) return <div className="history-loading">Loading quizzes…</div>;
+  // Filter quizzes based on search term
+  const filteredQuizzes = quizzes.filter(quiz => {
+    const searchLower = searchTerm.toLowerCase();
+    return (
+      quiz.title?.toLowerCase().includes(searchLower) ||
+      quiz.category?.toLowerCase().includes(searchLower)
+    );
+  });
+
+  if (loading) return <div className="history-loading">Loading finished quizzes...</div>;
   if (error) return <div className="history-error">Error: {error}</div>;
-  if (!quizzes.length)
-    return <div className="history-empty">No quizzes found.</div>;
+  if (!quizzes.length) return <div className="history-empty">No finished quizzes found.</div>;
 
   return (
     <>
       <NavBar />
       <main className="history-main">
-        <h1 className="history-title">Quiz History</h1>
+        <h1 className="history-title">Finished Quizzes</h1>
+        <div className="history-search">
+          <input
+            type="text"
+            placeholder="Search quizzes..."
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            className="history-search-input"
+          />
+        </div>
         <ul className="history-list">
-          {quizzes.map((q) => (
-            <li key={q.id} className="history-card">
-              <h2 className="history-title-text">{q.title}</h2>
-              <p>Category: {q.category}</p>
-              <p>Status: {q.isActive ? "Active" : "Closed"}</p>
-              <p>Questions: {q.questions}</p>
-              <p>Max Attempts: {q.maxAttempts}</p>
-              <p>Time Limit: {q.timeLimit} min</p>
-              <button
-                className="history-action"
-                onClick={() => navigate(`/quiz/${q.id}/detail`)}
-              >
-                View Details
-              </button>
+          {filteredQuizzes.map((quiz) => (
+            <li key={quiz.id} className="history-card">
+              <div className="history-card-row">
+                <h2 className="history-card-title">{quiz.title}</h2>
+                <span className="history-card-category">{quiz.category}</span>
+                <div className="history-info-group">
+                  <span className="history-info-label">
+                    <i className="fas fa-clock"></i>
+                    Duration: {quiz.time_limit}min
+                  </span>
+                  <span className="history-info-label">
+                    <i className="fas fa-redo"></i>
+                    Attempts: {quiz.max_attempts}
+                  </span>
+                </div>
+                <div className="history-dates">
+                  <span className="history-date-value">
+                    Start: {new Date(quiz.start_time).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                  <span className="history-date-value">
+                    End: {new Date(quiz.end_time).toLocaleString('en-US', {
+                      month: 'short',
+                      day: 'numeric',
+                      hour: '2-digit',
+                      minute: '2-digit'
+                    })}
+                  </span>
+                </div>
+                <button
+                  className="history-view-results"
+                  onClick={() => navigate(`/quiz-results/${quiz.id}`)}
+                >
+                  View Results
+                </button>
+              </div>
             </li>
           ))}
         </ul>
