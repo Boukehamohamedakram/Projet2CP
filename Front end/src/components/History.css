@@ -1,13 +1,18 @@
-/* Title and Search Section */
+/* Main container */
 .history-main {
+  width: 90%; /* Reduce from 100% to 90% */
+  max-width: 1400px;
+  margin: 24px auto;
   padding: 2rem;
   background-color: #f5f7fa;
-  min-height: calc(100vh - 60px);
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 24px;
+  min-height: calc(100vh - 60px);
 }
 
+/* Page title */
 .history-title {
   font-size: 2.5rem;
   color: #0e87c1;
@@ -16,6 +21,52 @@
   font-weight: bold;
 }
 
+/* Filter + Search Bar */
+.history-filter-search {
+  width: 90%;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  justify-content: center;
+}
+
+.hs-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.hs-filter {
+  background: none;
+  border: none;
+  color: #1a75d1;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.hs-arrow {
+  margin-left: 4px;
+  font-size: 0.8rem;
+}
+
+.hs-input {
+  width: 100%;
+  max-width: 600px;
+  padding: 12px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.hs-input:focus {
+  outline: none;
+  border-color: #0e87c1;
+  box-shadow: 0 0 0 2px rgba(14, 135, 193, 0.1);
+}
+
+/* Update search bar to match Programmed */
 .history-search {
   width: 90%;
   margin: 0 auto 2rem auto;
@@ -33,75 +84,96 @@
   text-align: center;
 }
 
-/* Card Layout */
+.history-search-input:focus {
+  outline: none;
+  border-color: #0e87c1;
+  box-shadow: 0 0 0 2px rgba(14, 135, 193, 0.1);
+}
+
+/* List of cards */
 .history-list {
-  width: 90%;
-  margin: 0 auto;
-  list-style: none;
-  padding: 0;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
 }
 
+.history-row {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+}
+
+/* Update the grid layout to match Programmed */
 .history-card {
+  display: grid;
+  grid-template-columns: minmax(200px, 2fr) minmax(150px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) 100px;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
   background: white;
-  border-radius: 8px;
-  padding: 1rem;
-  margin-bottom: 1rem;
+  border-radius: 0.75rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  margin-bottom: 1rem;
+  width: 100%;
+  box-sizing: border-box; /* Add this to include padding in width calculation */
+  margin-left: auto;
+  margin-right: auto;
+  transition: all 0.2s ease;
 }
 
-.history-card-row {
-  display: flex;
-  align-items: center;
-  gap: 2rem;
-  flex: 1;
+/* Match hover effect */
+.history-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
 }
 
+/* Match title style */
 .history-card-title {
-  font-size: 1.4rem;
-  color: #0e87c1;
-  margin: 0;
-  min-width: 150px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
 }
 
+/* Match category style */
 .history-card-category {
-  background: #f0f7ff;
-  color: #0e87c1;
-  padding: 0.4rem 0.8rem;
+  background: #f5c518;
+  color: #333;
+  padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.9rem;
+}
+
+/* Match date and time style */
+.history-card-date,
+.history-card-time {
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 12px;
   white-space: nowrap;
-}
-
-.history-info-group {
-  display: flex;
-  gap: 2rem;
+  display: inline-flex;
   align-items: center;
-  margin: 0 2rem;
+  gap: 4px;
+  font-size: 0.9rem;
 }
 
-.history-dates {
-  display: flex;
-  gap: 2rem;
-  align-items: center;
-  margin-right: 2rem;
-}
-
+/* Match button style */
 .history-view-results {
-  background-color: #0e87c1;
-  color: white;
+  background: #3498db;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  padding: 0.6rem 1.2rem;
-  font-size: 0.95rem;
+  padding: 6px 12px;
+  border-radius: 12px;
   cursor: pointer;
-  transition: all 0.2s;
-  margin-left: auto;
-  white-space: nowrap;
+  font-size: 0.9rem;
+  transition: opacity 0.2s;
 }
 
+.history-view-results:hover {
+  opacity: 0.9;
+}
+
+/* States */
 .history-loading,
 .history-error,
 .history-empty {
@@ -115,66 +187,68 @@
   color: #e53e3e;
 }
 
-/* Tablet */
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .history-card {
+    grid-template-columns: minmax(150px, 1.5fr) minmax(120px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr) 90px;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+}
+
 @media (max-width: 768px) {
-  .history-dates {
-    flex-direction: column;
-    gap: 1.5rem;
+  .history-main {
+    padding: 0 16px;
   }
 
-  .history-card-content {
+  .history-filter-search {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .history-card {
+    display: flex;
     flex-direction: column;
     align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
   }
 
-  .history-dates-compact {
-    flex-direction: column;
-    gap: 0.5rem;
+  .history-card-title {
+    width: 100%;
+    margin-bottom: 8px;
   }
 
-  .history-info-row {
-    flex-direction: column;
-    text-align: center;
+  .history-card-category,
+  .history-card-date,
+  .history-card-time {
+    width: auto;
+    margin: 4px 0;
   }
 
-  .history-info-label {
-    margin-bottom: 0.25rem;
-  }
-
-  .history-info-value {
-    text-align: center;
+  .history-view-results {
+    width: 100%;
+    margin-top: 8px;
   }
 }
 
-/* Large Screens */
-@media (max-width: 1200px) {
-  .history-card-row {
-    grid-template-columns: 1fr;
-    gap: 1rem;
+@media (max-width: 480px) {
+  .history-title {
+    font-size: 1.5rem;
   }
-  
-  .history-info-group,
-  .history-dates {
-    justify-content: center;
+
+  .hs-input {
+    font-size: 0.9rem;
   }
-  
-  ..history-view-results {
-    background-color: #0e87c1;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    padding: 0.6rem 1.2rem;
+
+  .history-card-title {
     font-size: 0.95rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    margin-left: auto;
-    white-space: nowrap;
   }
-}
 
-/* Update media query for better responsiveness */
-@media (max-width: 1400px) {
-  .history-list {
-    max-width: 95%;
+  .history-card-category,
+  .history-card-date,
+  .history-card-time {
+    font-size: 0.75rem;
+    padding: 4px 8px;
   }
 }

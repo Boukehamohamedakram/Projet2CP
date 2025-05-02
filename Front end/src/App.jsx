@@ -26,17 +26,21 @@ function App() {
         <Route path="/forgot-password" element={<ForgotPassword3 />} />
         <Route path="/signup" element={<SignUpPage />} />
         <Route path="/otp-verification" element={<OTPVerification />} />
-        <Route path="/create" element={<Quizzes />} /> 
+        <Route path="/create/:id" element={<Quizzes />} />
+        <Route path="/create" element={<Quizzes />} />
         <Route path="/change-user-info" element={<ChangeUserInfo />} />
         <Route path="/dashboard" element={<GeneralStatistics />} />
         <Route path="/quiz-statistics" element={<QuizStatistics />} />
         <Route path="/navbar" element={<NavBar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/scheduled" element={<Scheduled />} />
+        <Route path="/create-quiz" element={<Quizzes />} />
+        <Route path="/quiz-editor/:id" element={<Quizzes />} />
         <Route path="/history" element={<History />} />
         <Route path="/programmed" element={<Programmed />} />
         <Route path="/student" element={<Student />} />
         <Route path="/parameters"     element={<Parameters />} /> 
+        <Route path="/quizzes" element={<Quizzes />} />
         {/* Add more routes as needed */}
       </Routes>
     </BrowserRouter>

@@ -76,7 +76,7 @@ export default function Home() {
             <span className="home-main__sun">☀️</span>
             <span className="home-main__good-morning">GOOD MORNING</span>
           </div>
-          <h1 className="home-main__name">{userName}</h1>
+          <h1 className="home-main__name">Pr.{userName}</h1>
           <p className="home-main__welcome">
             Welcome to your Quiz Dashboard!<br/>
             Create, manage, and track your quizzes with ease. 
@@ -93,12 +93,12 @@ export default function Home() {
 
         {/* Right: action cards */}
         <section className="home-main__cards">
-          <Link to="/create" className="home-card">
+          <Link to="/scheduled" className="home-card">
             <img src={createIcon} alt="Create new quiz" />
             <span>Create New Quiz</span>
           </Link>
-          <Link to="/scheduled" className="home-card">
-            <img src={scheduledIcon} alt="Scheduled quizzes" />
+          <Link to="/programmed" className="home-card">
+            <img src={scheduledIcon} alt="Programmed quizzes" />
             <span>Programmed Quizzes</span>
           </Link>
           <Link to="/history" className="home-card">

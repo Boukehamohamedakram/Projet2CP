@@ -8,9 +8,9 @@ import userAvatar from '../assets/Avatar.png';
 export default function NavBar() {
   return (
     <nav className="quizpi-navbar">
-      <div className="quizpi-navbar__logo">
+      <Link to="/home" className="quizpi-navbar__logo">
         <img src={logo} alt="Logo" />
-      </div>
+      </Link>
 
       <ul className="quizpi-navbar__links">
         <li><Link to="/home">HOME</Link></li>

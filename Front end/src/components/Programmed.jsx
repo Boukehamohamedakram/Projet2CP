@@ -232,8 +232,10 @@ export default function Programmed() {
                   {editingQuiz === q.id ? (
                     <>
                       <input
+                        type="text" // Add input type
                         className="card-title"
-                        defaultValue={q.title}
+                        defaultValue={q.title || ''} // Add fallback empty string
+                        placeholder="Enter title" // Add placeholder
                         onChange={(e) => {
                           const updated = { ...q, title: e.target.value };
                           setQuizzes(quizzes.map(quiz => quiz.id === q.id ? updated : quiz));
@@ -285,7 +287,9 @@ export default function Programmed() {
                     </>
                   ) : (
                     <>
-                      <span className="card-title">{q.title || "No available title"}</span>
+                      <div className="card-title">
+                        {q.title || "Untitled Quiz"} {/* Add fallback text */}
+                      </div>
                       <span className="card-category">
                         {VALID_CATEGORIES.find(cat => cat.value === q.category)?.label || "No category"}
                       </span>

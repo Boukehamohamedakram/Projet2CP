@@ -75,7 +75,7 @@ export default function Parameters() {
       <NavBar />
       <main className="parameters-main">
         <h1 className="parameters-heading">☀️ GOOD MORNING</h1>
-        <h2 className="parameters-username">{profile.fullName}</h2>
+        <h2 className="parameters-username">Pr.{profile.fullName}</h2>
 
         {view === 'default' && (
           <div className="parameters-card">

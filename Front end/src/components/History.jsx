@@ -88,7 +88,7 @@ export default function History() {
     <>
       <NavBar />
       <main className="history-main">
-        <h1 className="history-title">Finished Quizzes</h1>
+        <h1 className="history-title">History Quizzes</h1>
         <div className="history-search">
           <input
             type="text"
@@ -101,44 +101,17 @@ export default function History() {
         <ul className="history-list">
           {filteredQuizzes.map((quiz) => (
             <li key={quiz.id} className="history-card">
-              <div className="history-card-row">
-                <h2 className="history-card-title">{quiz.title}</h2>
-                <span className="history-card-category">{quiz.category}</span>
-                <div className="history-info-group">
-                  <span className="history-info-label">
-                    <i className="fas fa-clock"></i>
-                    Duration: {quiz.time_limit}min
-                  </span>
-                  <span className="history-info-label">
-                    <i className="fas fa-redo"></i>
-                    Attempts: {quiz.max_attempts}
-                  </span>
-                </div>
-                <div className="history-dates">
-                  <span className="history-date-value">
-                    Start: {new Date(quiz.start_time).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                  <span className="history-date-value">
-                    End: {new Date(quiz.end_time).toLocaleString('en-US', {
-                      month: 'short',
-                      day: 'numeric',
-                      hour: '2-digit',
-                      minute: '2-digit'
-                    })}
-                  </span>
-                </div>
-                <button
-                  className="history-view-results"
-                  onClick={() => navigate(`/quiz-results/${quiz.id}`)}
-                >
-                  View Results
-                </button>
-              </div>
+              <div className="history-card-title">{quiz.title}</div>
+              <span className="history-card-category">{quiz.category}</span>
+              <span className="history-card-date">
+                {new Date(quiz.start_time).toLocaleDateString()}
+              </span>
+              <span className="history-card-time">
+                {new Date(quiz.start_time).toLocaleTimeString()}
+              </span>
+              <button className="history-view-results" onClick={() => navigate(`/quiz-results/${quiz.id}`)}>
+                View Results
+              </button>
             </li>
           ))}
         </ul>
