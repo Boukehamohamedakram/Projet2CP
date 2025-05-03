@@ -10,6 +10,8 @@ import createIcon    from '../assets/create-icon.png';
 import scheduledIcon from '../assets/scheduled-icon.png';
 import historyIcon   from '../assets/history-icon.png';
 
+
+const API = import.meta.env.VITE_API_URL;
 export default function Home() {
   const [userName, setUserName] = useState('Loading...');
 
@@ -28,7 +30,7 @@ export default function Home() {
           return;
         }
 
-        const response = await fetch('http://localhost:8000/api/users/users/', {
+        const response = await fetch(`${API}/api/users/users/`, {
           headers: {
             'Authorization': `Token ${token}`,
             'Content-Type': 'application/json'
