@@ -58,34 +58,33 @@ const CreateNewPassword = () => {
         return;
       }
 
-      // First, verify current password
-      const verifyData = {
-        username: username,
-        password: currentPassword
-      };
-
       try {
-        // Verify current password by attempting to login
-        const verifyResponse = await axios.post(`${API}/api/users/login/`, verifyData);
-        console.log("Password verification response:", verifyResponse.data);
-        
-        // If verification succeeds, proceed with password update
-        const userResponse = await axios.get(`${API}/api/users/users/${userId}/`, {
-          headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json'
-          }
+        // Verify current password using fetch like in LoginPage1
+        const verifyResponse = await fetch(`${API}/api/users/login/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ 
+            username: username, 
+            password: currentPassword,
+            role: "teacher"  // Add teacher role
+          })
         });
 
-        // Update password
-        const userData = {
-          ...userResponse.data,
-          password: newPassword
-        };
+        const verifyData = await verifyResponse.json();
+        
+        if (!verifyResponse.ok) {
+          console.error("Verification failed:", verifyData);
+          throw new Error(verifyData.detail || "Current password is incorrect");
+        }
 
+        // If verification succeeds, update password
         const response = await axios.put(
           `${API}/api/users/users/${userId}/`,
-          userData,
+          { 
+            password: newPassword,
+            username: username,
+            role: "teacher"
+          },
           {
             headers: {
               'Authorization': `Token ${token}`,
@@ -96,14 +95,14 @@ const CreateNewPassword = () => {
 
         console.log("Password update response:", response.data);
         setSuccess(true);
-        
+
       } catch (verifyErr) {
         console.error("Password verification failed:", verifyErr);
-        setError("Current password is incorrect");
+        setError(verifyErr.message || "Current password is incorrect");
         setIsLoading(false);
         return;
       }
-      
+
     } catch (err) {
       console.error("Error updating password:", err);
 

@@ -2,12 +2,10 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import LoginPage from "./login/jsx/LoginPage1.jsx";
 import CreateNewPassword from "./login/jsx/ResetPasswordPage5.jsx";
 import SignUpPage from "./login/jsx/SignUp.jsx";
-import OTPVerification from "./login/jsx/OTPVerification4.jsx";
 import Quizzes from "./quiz/Quizzes.jsx";
 import GeneralStatistics from "./dashboard/JSX/GeneralStatistics.jsx";
 import QuizStatistics from "./dashboard/JSX/QuizStatistics.jsx";
 import UpdateUserInfo from "./login/jsx/UpdateUserInfo.jsx";
-// Other imp
 import NavBar from "./components/NavBar.jsx";
 import Footer from "./components/Footer.jsx";
 import Home from "./components/Home";
@@ -25,7 +23,6 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/change-password" element={<CreateNewPassword />} />
         <Route path="/signup" element={<SignUpPage />} />
-        <Route path="/otp-verification" element={<OTPVerification />} />
         <Route path="/create/:id" element={<Quizzes />} />
         <Route path="/create" element={<Quizzes />} />
         <Route path="/dashboard" element={<GeneralStatistics />} />
@@ -41,7 +38,6 @@ function App() {
         <Route path="/parameters"     element={<Parameters />} /> 
         <Route path="/quizzes" element={<Quizzes />} />
         <Route path="/update-user-info" element={<UpdateUserInfo />} />
-        {/* Add more routes as needed */}
       </Routes>
     </BrowserRouter>
   );

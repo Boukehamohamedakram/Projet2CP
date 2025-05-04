@@ -29,6 +29,7 @@ export default function LoginPage() {
         // Store token and userId
         localStorage.setItem("token", data.token);
         localStorage.setItem("userId", data.id.toString());
+        localStorage.setItem("username", username);
         
         // Redirect to home page using navigate
         navigate('/home');
@@ -116,7 +117,7 @@ export default function LoginPage() {
             <label htmlFor="password" className="form-label">
               Enter your Password:
             </label>
-            <div className="password-input-wrapper">
+            <div className="passworde-input-wrapper">
               <input
                 id="password"
                 name="password"
@@ -130,7 +131,7 @@ export default function LoginPage() {
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
-                className="toggle-password"
+                className="toggle-passworde"
                 role="button"
                 tabIndex={0}
                 aria-label={showPassword ? "Hide password" : "Show password"}
@@ -168,7 +169,7 @@ export default function LoginPage() {
             </div>
           </div>
 
-          <Link to="/forgot-password" className="forgot-password-link">
+          <Link to="/forgot-password" className="forgot-passworde-link">
             Forgot Password?
           </Link>
 

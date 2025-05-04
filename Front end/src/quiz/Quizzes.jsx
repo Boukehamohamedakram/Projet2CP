@@ -14,9 +14,8 @@ const QUIZ_CATEGORIES = [
 ];
 
 const QUESTION_TYPES = [
-  { value: 'multiple_choice', label: 'Multiple Choice' },
-  { value: 'single_choice', label: 'Single Choice' },
-  { value: 'true_false', label: 'True/False' }
+  { value: 'mcq', label: 'Multiple Choice' },
+  { value: 'tf', label: 'True/False' }
 ];
 
 const Quizzes = () => {
@@ -34,8 +33,8 @@ const Quizzes = () => {
     max_attempts: 1,
     assigned_groups: [],
     is_published: false,
-    start_time: null,
-    end_time: null
+    start_time: '',
+    end_time: ''
   });
 
   const [questions, setQuestions] = useState([]);
@@ -223,128 +222,178 @@ const Quizzes = () => {
     setCurrentQuestion(questions[currentQuestionIndex - 1]);
   };
 
+  // Validate quiz data
+  const validateQuizData = () => {
+    const requiredFields = {
+      title: quizData.title,
+      category: quizData.category,
+      time_limit: quizData.time_limit,
+      max_attempts: quizData.max_attempts,
+      assigned_groups: quizData.assigned_groups
+    };
+
+    // Check if any required field is missing
+    const missingFields = Object.entries(requiredFields)
+      .filter(([_, value]) => !value)
+      .map(([key]) => key);
+
+    if (missingFields.length > 0) {
+      throw new Error(`Missing required fields: ${missingFields.join(', ')}`);
+    }
+
+    if (quizData.start_time && quizData.end_time) {
+      const start = new Date(quizData.start_time);
+      const end = new Date(quizData.end_time);
+      if (start >= end) {
+        throw new Error('End time must be after start time');
+      }
+    }
+
+    // Check if there are any questions
+    if (questions.length === 0) {
+      throw new Error('Please add at least one question');
+    }
+
+    // Validate each question
+    for (const question of questions) {
+      if (!question.text.trim()) {
+        throw new Error('All questions must have text');
+      }
+      if (question.options.filter(opt => opt.trim()).length < 2) {
+        throw new Error('Each question must have at least 2 options');
+      }
+      if (question.correctAnswers.length === 0) {
+        throw new Error('Each question must have at least one correct answer');
+      }
+    }
+  };
+
   // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    // Save current question if it's valid
-    if (currentQuestion.text && 
-        currentQuestion.options.some(opt => opt.trim()) && 
-        currentQuestion.correctAnswers.length > 0) {
-      handleSaveQuestion();
-    }
-
-    // Get final questions array
-    const allQuestions = questions.filter(q => 
-      q.text && 
-      q.options.some(opt => opt.trim()) && 
-      q.correctAnswers.length > 0
-    );
-
-    if (allQuestions.length === 0) {
-      setError('Please add at least one valid question');
-      return;
-    }
-
     setLoading(true);
+    setError(null);
 
     try {
-      const userDataString = localStorage.getItem('userData');
-      if (!userDataString) throw new Error('Please login to continue');
-      
-      const userData = JSON.parse(userDataString);
+      // Validate quiz data
+      validateQuizData();
 
-      // First create the quiz without questions
-      const quizPayload = {
-        title: quizData.title,
-        description: quizData.description || 'None',
-        category: quizData.category,
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      
+      // Format dates properly
+      const formattedQuizData = {
+        ...quizData,
+        start_time: quizData.start_time ? new Date(quizData.start_time).toISOString() : null,
+        end_time: quizData.end_time ? new Date(quizData.end_time).toISOString() : null,
         time_limit: parseInt(quizData.time_limit),
         max_attempts: parseInt(quizData.max_attempts),
-        is_published: quizData.is_published,
-        start_time: quizData.start_time,
-        end_time: quizData.end_time,
-        teacher: userData.id,
-        assigned_groups: quizData.assigned_groups
+        teacher: userData.id, // Add teacher ID
+        assigned_groups: quizData.assigned_groups.map(id => parseInt(id))
       };
 
-      // Create quiz
+      // Add this before the fetch call
+      console.log('Submitting quiz data:', {
+        formattedQuizData,
+        token: userData.token,
+        url: `${API}/api/Quiz/quizzes/`
+      });
+
+      // Create quiz with formatted data
       const quizResponse = await fetch(`${API}/api/Quiz/quizzes/`, {
         method: 'POST',
         headers: {
           'Authorization': `Token ${userData.token}`,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(quizPayload)
+        body: JSON.stringify(formattedQuizData)
       });
 
+      // Log the response for debugging
+      const responseData = await quizResponse.json();
+      
       if (!quizResponse.ok) {
-        const errorData = await quizResponse.json();
-        throw new Error(errorData.detail || 'Failed to create quiz');
+        console.error('Quiz creation failed:', responseData);
+        throw new Error(responseData.detail || 'Failed to create quiz');
       }
 
-      const createdQuiz = await quizResponse.json();
-      console.log('Quiz created:', createdQuiz);
+      const createdQuiz = responseData;
+      console.log('Created quiz:', createdQuiz);
 
-      // Prepare all questions for the POST request
-      const questionsPayload = allQuestions.map(question => {
-        const validOptions = question.options
-          .filter(opt => opt.trim())
-          .map((optionText, index) => {
-            const originalIndex = question.options.indexOf(optionText);
-            return {
-              text: optionText.trim(),
-              is_correct: question.correctAnswers.includes(originalIndex)
-            };
-          });
-
-        return {
-          text: question.text.trim(),
-          points: parseInt(question.marks),
-          type: 'mcq',
-          options: validOptions
-        };
-      });
-
-      console.log('Sending questions payload:', JSON.stringify(questionsPayload, null, 2));
-
-      // Use POST to add questions to the quiz
-      const questionsResponse = await fetch(`${API}/api/Quiz/quizzes/questions/${createdQuiz.id}/`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Token ${userData.token}`,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(questionsPayload)
-      });
-
-      if (!questionsResponse.ok) {
-        const errorData = await questionsResponse.json();
-        console.error('Questions creation error:', errorData);
-        throw new Error(
-          Array.isArray(errorData) ? errorData.join(', ') :
-          typeof errorData === 'object' ? Object.entries(errorData).map(([k,v]) => `${k}: ${v}`).join(', ') :
-          'Failed to add questions to quiz'
-        );
-      }
-
-      const updatedQuiz = await questionsResponse.json();
-      console.log('Quiz updated with questions:', updatedQuiz);
-
-      // Show success message before navigating
-      setError(null); // Clear any existing errors
-      alert('Quiz successfully created!'); // Simple success notification
-
-      navigate('/programmed', {
-        state: { 
-          success: true,
-          message: 'Quiz created successfully',
-          quizId: createdQuiz.id
+      // Create questions and their options
+      for (const question of questions) {
+        // Save current question before creating
+        if (currentQuestionIndex === questions.length - 1) {
+          handleSaveQuestion();
         }
+
+        // First create the question
+        const questionResponse = await fetch(`${API}/api/Quiz/questions/`, {
+          method: 'POST',
+          headers: {
+            'Authorization': `Token ${userData.token}`,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            quiz: createdQuiz.id,
+            text: question.text,
+            question_type: question.type === 'true_false' ? 'tf' : 'mcq',
+            points: parseInt(question.marks),
+            options: question.options
+              .filter(opt => opt.trim()) // Remove empty options
+              .map((optionText, index) => ({
+                text: optionText,
+                is_correct: question.correctAnswers.includes(index)
+              }))
+          })
+        });
+
+        if (!questionResponse.ok) {
+          const errorData = await questionResponse.json();
+          console.error('Question creation error:', errorData);
+          throw new Error(errorData.detail || 'Failed to create question');
+        }
+
+        const createdQuestion = await questionResponse.json();
+        console.log('Created question:', createdQuestion);
+
+        // Create options using the correct endpoint
+        const optionsPromises = question.options
+          .filter(opt => opt.trim())
+          .map((optionText, index) => 
+            fetch(`${API}/api/Quiz/questions/${createdQuestion.id}/options/create/`, {
+              method: 'POST',
+              headers: {
+                'Authorization': `Token ${userData.token}`,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                text: optionText,
+                is_correct: question.correctAnswers.includes(index)
+              })
+            })
+          );
+
+        // Wait for all options to be created
+        const optionsResponses = await Promise.all(optionsPromises);
+        
+        // Check if any option creation failed
+        for (const response of optionsResponses) {
+          if (!response.ok) {
+            const errorData = await response.json();
+            console.error('Option creation error:', errorData);
+            throw new Error('Failed to create options');
+          }
+        }
+      }
+
+      console.log('Quiz creation completed');
+      navigate('/programmed', { 
+        state: { success: true, message: 'Quiz created successfully' }
       });
-    } catch (err) {
-      setError(err.message);
-      console.error('Submit error:', err);
+
+    } catch (error) {
+      console.error('Quiz creation error:', error);
+      setError(error.message || 'Failed to create quiz');
     } finally {
       setLoading(false);
     }

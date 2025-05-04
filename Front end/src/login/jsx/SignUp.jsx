@@ -124,7 +124,7 @@ export default function SignUpPage() {
 
           <div className="form-group">
             <label className="form-label">Create a Password:</label>
-            <div className="password-input-wrapper">
+            <div className="passworde-input-wrapper">
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
@@ -135,7 +135,7 @@ export default function SignUpPage() {
               />
               <span
                 onClick={() => setShowPassword(!showPassword)}
-                className="toggle-password"
+                className="toggle-passworde"
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
