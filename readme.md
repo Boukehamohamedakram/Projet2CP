@@ -12,3 +12,8 @@ question les madjabouch fiha mli uu display the qst + percentage of student li r
 top 6 students
 
 bar char  x groups y average
+
+
+
+
+3la hssab time limit and  max attemmpts student dymn assigned but submit answers thbess

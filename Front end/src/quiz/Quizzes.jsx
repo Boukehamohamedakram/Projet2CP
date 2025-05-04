@@ -59,18 +59,11 @@ const Quizzes = () => {
         }
 
         const userData = JSON.parse(userDataString);
-        console.log('User data found:', userData); // Debug log
-
-        // Check if user is a teacher
-        if (userData.role !== 'teacher') {
-          console.log('User is not a teacher');
-          navigate('/');
+        if (!userData.token || userData.role !== 'teacher') {
+          console.log('Invalid user data');
+          navigate('/login');
           return;
         }
-
-        // Skip token verification since we already have a valid session
-        setLoading(false);
-
       } catch (error) {
         console.error('Authentication error:', error);
         navigate('/login');
@@ -82,38 +75,34 @@ const Quizzes = () => {
 
   // Fetch only groups on component mount
   useEffect(() => {
-    const fetchGroups = async () => {
-      try {
-        const userData = JSON.parse(localStorage.getItem('userData'));
-        if (!userData || !userData.token) {
-          throw new Error('No authentication token found');
-        }
-
-        console.log('Fetching groups with token:', userData.token); // Debug log
-        
-        const groupsResponse = await fetch(`${API}/api/Quiz/groups/`, {
-          headers: {
-            'Authorization': `Token ${userData.token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!groupsResponse.ok) {
-          throw new Error('Failed to fetch groups');
-        }
-
-        const groupsData = await groupsResponse.json();
-        setGroups(groupsData);
-      } catch (err) {
-        setError('Error loading groups');
-        console.error('Groups fetch error:', err);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchGroups();
   }, []);
+
+  const fetchGroups = async () => {
+    try {
+      const userData = JSON.parse(localStorage.getItem('userData'));
+      if (!userData || !userData.token) {
+        throw new Error('No authentication token found');
+      }
+
+      const groupsResponse = await fetch(`${API}/api/Quiz/groups/`, {
+        headers: {
+          'Authorization': `Token ${userData.token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      if (!groupsResponse.ok) {
+        throw new Error('Failed to fetch groups');
+      }
+
+      const groupsData = await groupsResponse.json();
+      setGroups(groupsData);
+    } catch (err) {
+      setError('Error loading groups');
+      console.error('Groups fetch error:', err);
+    }
+  };
 
   // Handle form input changes
   const handleInputChange = (e) => {

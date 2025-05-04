@@ -1,6 +1,7 @@
 from django.db import models
 from django.conf import settings
 from django.utils import timezone
+from django.utils.timezone import now
 
 User = settings.AUTH_USER_MODEL  # Reference the custom User model
 
@@ -34,16 +35,25 @@ class Quiz(models.Model):
         blank=True
     )
     assigned_groups = models.ManyToManyField('Group', related_name='quizzes', blank=True)
-    time_limit = models.IntegerField(help_text="Time limit in minutes")
+    time_limit = models.IntegerField(help_text="Time limit in minutes", null=True, blank=True)
     is_published = models.BooleanField(default=False)
     start_time = models.DateTimeField(null=True, blank=True)
     end_time = models.DateTimeField(null=True, blank=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='math')
     max_attempts = models.PositiveIntegerField(default=1, help_text="Maximum number of attempts allowed per student")
+    is_active = models.BooleanField(default=False)  # Add this field
 
-    
+    def update_is_active(self):
+        """Update the is_active field based on start_time, end_time, and is_published."""
+        current_time = now()
+        if self.is_published and self.start_time and self.end_time:
+            self.is_active = self.start_time <= current_time <= self.end_time
+        else:
+            self.is_active = False
+        self.save()
+
     @property
-    def is_active(self):
+    def is_active_property(self):
         """Check if the quiz is currently active based on time"""
         now = timezone.now()
         

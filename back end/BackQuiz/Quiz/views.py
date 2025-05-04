@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer, QuizResultDetailSerializer, StudentQuizHistorySerializer
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 from rest_framework.views import APIView
+from django.db.models import Avg, Count, F, Q
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -31,13 +32,15 @@ class AssignedQuizListView(generics.ListAPIView):
 
     def get_queryset(self):
         student = self.request.user
-        
+        print(f"Student: {student}")
+
         # Get all quizzes assigned to the student
         assigned_quizzes = Quiz.objects.filter(
             models.Q(assigned_students=student) | 
             models.Q(assigned_groups__students=student)
         ).distinct()
-        
+        print(f"Assigned Quizzes: {assigned_quizzes}")
+
         # Filter out quizzes where the student has used all attempts
         available_quizzes = []
         for quiz in assigned_quizzes:
@@ -46,29 +49,31 @@ class AssignedQuizListView(generics.ListAPIView):
                 student=student,
                 is_completed=True
             ).count()
-            
+            print(f"Quiz: {quiz.title}, Attempts Count: {attempts_count}, Max Attempts: {quiz.max_attempts}, Is Active: {quiz.is_active}")
+
             if attempts_count < quiz.max_attempts and quiz.is_active:
                 available_quizzes.append(quiz.id)
-                
+
+        print(f"Available Quizzes: {available_quizzes}")
         return Quiz.objects.filter(id__in=available_quizzes)
 
 class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacherOrReadOnly]
-    
+
     def perform_update(self, serializer):
         # Save the quiz with core fields
         quiz = serializer.save()
-        
-        # Handle assigned students and groups manually to prevent auto-selection
-        if 'assigned_students' in serializer.validated_data:
-            assigned_students = serializer.validated_data.get('assigned_students', [])
-            quiz.assigned_students.set(assigned_students)
-            
-        if 'assigned_groups' in serializer.validated_data:
-            assigned_groups = serializer.validated_data.get('assigned_groups', [])
-            quiz.assigned_groups.set(assigned_groups)
+
+        # Handle assigned students and groups manually
+        assigned_students = serializer.validated_data.get('assigned_students', None)
+        if assigned_students is not None:
+            quiz.assigned_students.set(assigned_students)  # Use .set() for ManyToManyField
+
+        assigned_groups = serializer.validated_data.get('assigned_groups', None)
+        if assigned_groups is not None:
+            quiz.assigned_groups.set(assigned_groups)  # Use .set() for ManyToManyField
 
 # Student-specific views for accessing quiz structure
 class StudentQuizQuestionsView(generics.ListAPIView):
@@ -486,6 +491,69 @@ class AbsentStudentsView(APIView):
             ]
 
             return Response({"absent_students": data}, status=200)
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found."}, status=404)
+
+
+class QuizAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def get(self, request, quiz_id):
+        try:
+            quiz = Quiz.objects.get(pk=quiz_id)
+
+            # Total students assigned to the quiz
+            total_students = quiz.assigned_students.count()
+
+            # Students who submitted the quiz
+            submitted_students = Result.objects.filter(quiz=quiz).count()
+
+            # Completion rate
+            completion_rate = (submitted_students / total_students * 100) if total_students > 0 else 0
+
+            # Average score
+            average_score = Result.objects.filter(quiz=quiz).aggregate(Avg('score'))['score__avg'] or 0
+
+            # Top students
+            top_students = Result.objects.filter(quiz=quiz).order_by('-score')[:5]
+            top_students_data = [
+                {
+                    "id": result.student.id,
+                    "username": result.student.username,
+                    "score": result.score
+                }
+                for result in top_students
+            ]
+
+            # Hardest question (most students got wrong)
+            hardest_question = (
+                StudentAnswer.objects.filter(question__quiz=quiz)
+                .values('question')
+                .annotate(
+                    total_attempts=Count('id'),
+                    wrong_attempts=Count('id', filter=Q(selected_option__is_correct=False))
+                )
+                .order_by('-wrong_attempts')
+                .first()
+            )
+            hardest_question_data = None
+            if hardest_question:
+                question = Question.objects.get(pk=hardest_question['question'])
+                hardest_question_data = {
+                    "id": question.id,
+                    "text": question.text,
+                    "wrong_attempts": hardest_question['wrong_attempts'],
+                    "total_attempts": hardest_question['total_attempts']
+                }
+
+            # Return analytics data
+            return Response({
+                "completion_rate": round(completion_rate, 2),
+                "average_score": round(average_score, 2),
+                "top_students": top_students_data,
+                "hardest_question": hardest_question_data
+            }, status=200)
+
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=404)
 
