@@ -157,60 +157,52 @@ class StudentQuestionOptionsView(generics.ListAPIView):
 
 class QuizSubmitView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStudent]
-    
+
     def post(self, request, quiz_id):
         try:
             quiz = Quiz.objects.get(pk=quiz_id)
             student = request.user
-            
-            # Check if student can submit this quiz
+
+            # Check if student has attempts remaining
             attempts_count = QuizAttempt.objects.filter(
                 quiz=quiz,
                 student=student,
                 is_completed=True
             ).count()
-            
+
             if attempts_count >= quiz.max_attempts:
-                return Response(
-                    {"error": "You have used all your allowed attempts for this quiz."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-            
+                return Response({"error": "You have used all your allowed attempts."}, status=status.HTTP_403_FORBIDDEN)
+
             # Get or create the current attempt
-            current_attempt, created = QuizAttempt.objects.get_or_create(
+            current_attempt, _ = QuizAttempt.objects.get_or_create(
                 quiz=quiz,
                 student=student,
                 is_completed=False,
                 defaults={'attempt_number': attempts_count + 1}
             )
-            
-            # Mark current attempt as completed
+
+            # Mark the attempt as completed
             current_attempt.is_completed = True
             current_attempt.completed_at = timezone.now()
             current_attempt.save()
-            
-            # Calculate score for this attempt
-            result, created = Result.objects.get_or_create(
+
+            # Calculate the score
+            result, _ = Result.objects.get_or_create(
                 quiz=quiz,
                 student=student,
                 defaults={'score': 0, 'max_score': quiz.questions.aggregate(total_points=models.Sum('points'))['total_points']}
             )
             result.calculate_score()
-            
+
             return Response({
                 "message": "Quiz submitted successfully.",
-                "attempt_number": current_attempt.attempt_number,
-                "attempts_remaining": max(0, quiz.max_attempts - attempts_count - 1),
                 "score": result.score,
                 "max_score": result.max_score,
                 "percentage": round((result.score / result.max_score * 100) if result.max_score > 0 else 0, 2)
             })
-            
+
         except Quiz.DoesNotExist:
-            return Response(
-                {"error": "Quiz not found."},
-                status=status.HTTP_404_NOT_FOUND
-            )
+            return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class QuestionListCreateView(generics.ListCreateAPIView):
     serializer_class = QuestionSerializer
@@ -282,51 +274,51 @@ class StudentAnswerListCreateView(generics.ListCreateAPIView):
         return StudentAnswer.objects.filter(student=self.request.user)
 
     def create(self, request, *args, **kwargs):
-        # Get question and check if its quiz is still active
         question_id = request.data.get('question')
+        selected_option_id = request.data.get('selected_option')
+        text_answer = request.data.get('text_answer')
+
         try:
             question = Question.objects.get(pk=question_id)
             quiz = question.quiz
             student = request.user
-            
-            # Check if quiz is active for submission
+
+            # Check if quiz is active
             if not quiz.is_active:
-                return Response(
-                    {"error": "This quiz is no longer active. You cannot submit answers."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-                
+                return Response({"error": "This quiz is no longer active."}, status=status.HTTP_403_FORBIDDEN)
+
             # Check if student has attempts remaining
             attempts_count = QuizAttempt.objects.filter(
                 quiz=quiz,
                 student=student,
                 is_completed=True
             ).count()
-            
+
             if attempts_count >= quiz.max_attempts:
-                return Response(
-                    {"error": "You have used all your allowed attempts for this quiz."},
-                    status=status.HTTP_403_FORBIDDEN
-                )
-            
+                return Response({"error": "You have used all your allowed attempts."}, status=status.HTTP_403_FORBIDDEN)
+
             # Get or create the current attempt
-            current_attempt, created = QuizAttempt.objects.get_or_create(
+            current_attempt, _ = QuizAttempt.objects.get_or_create(
                 quiz=quiz,
                 student=student,
                 is_completed=False,
                 defaults={'attempt_number': attempts_count + 1}
             )
-                
-            # Continue with normal creation process
-            return super().create(request, *args, **kwargs)
-            
-        except Question.DoesNotExist:
-            return Response(
-                {"error": "Question not found."},
-                status=status.HTTP_404_NOT_FOUND
+
+            # Save the answer
+            answer, created = StudentAnswer.objects.update_or_create(
+                student=student,
+                question=question,
+                defaults={
+                    'selected_option_id': selected_option_id,
+                    'text_answer': text_answer
+                }
             )
-        
-        
+
+            return Response({"message": "Answer saved successfully."}, status=status.HTTP_201_CREATED)
+
+        except Question.DoesNotExist:
+            return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
 
 class StudentAnswerDetailView(generics.RetrieveAPIView):
     queryset = StudentAnswer.objects.all()

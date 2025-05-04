@@ -46,13 +46,18 @@ urlpatterns = [
         path('answers/', StudentAnswerListCreateView.as_view(), name='answer-list-create'),
         path('answers/<int:pk>/', StudentAnswerDetailView.as_view(), name='answer-detail'),
         
+        # Submit answers for a question
+        path('quizzes/<int:quiz_id>/answers/', StudentAnswerListCreateView.as_view(), name='submit-answer'),
+
         # Results URLs
         path('results/', ResultListView.as_view(), name='result-list'),
         # Add this to your urlpatterns
         path('results/<int:pk>/detail/', StudentQuizResultDetailView.as_view(), name='student-quiz-result-detail'),
         # Add this to your urlpatterns
         path('quiz-history/', StudentQuizHistoryView.as_view(), name='student-quiz-history'),
-        path('quizzes/<int:quiz_id>/submit/', QuizSubmitView.as_view(), name='quiz-submit'),
+        
+        # Finalize quiz submission
+        path('quizzes/<int:quiz_id>/submit/', QuizSubmitView.as_view(), name='submit-quiz'),
         
         # Absent students URL
         path('quizzes/<int:quiz_id>/absent-students/', AbsentStudentsView.as_view(), name='absent-students'),
