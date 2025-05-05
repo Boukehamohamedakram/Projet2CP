@@ -26,6 +26,7 @@ export default function GeneralStatistics() {
     groups: null
   });
   const [searchTerm, setSearchTerm] = useState('');
+  const [quizData, setQuizData] = useState({ title: '', id: null });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -37,24 +38,14 @@ export default function GeneralStatistics() {
         }
 
         const userData = JSON.parse(userDataString);
-        if (userData.role !== 'teacher') {
-          setError({
-            quizzes: 'Access denied: Teacher privileges required',
-            groups: 'Access denied: Teacher privileges required'
-          });
-          return;
-        }
-
         const token = userData.token;
-        console.log('Using token:', token);
 
-        // Fetch Groups
         const groupResponse = await fetch(`${API}/api/Quiz/groups/`, {
           method: "GET",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
-            "Authorization": `Token ${token}`
-          }
+            "Authorization": `Token ${token}`,
+          },
         });
 
         if (!groupResponse.ok) {
@@ -64,28 +55,22 @@ export default function GeneralStatistics() {
         const groupData = await groupResponse.json();
         setGroups(groupData);
 
-        // Fetch Quizzes
         const quizResponse = await fetch(`${API}/api/Quiz/quizzes/`, {
           method: "GET",
-          headers: { 
+          headers: {
             "Content-Type": "application/json",
-            "Authorization": `Token ${token}`
-          }
+            "Authorization": `Token ${token}`,
+          },
         });
-        
+
         if (!quizResponse.ok) {
           throw new Error(`Quiz access denied: ${quizResponse.status}`);
         }
 
         const quizData = await quizResponse.json();
         setQuizzes(quizData);
-
       } catch (err) {
-        console.error("Authentication error:", err);
-        setError({
-          quizzes: err.message,
-          groups: err.message
-        });
+        setError({ quizzes: err.message, groups: err.message });
       } finally {
         setLoading({
           quizzes: false,
@@ -96,6 +81,40 @@ export default function GeneralStatistics() {
 
     fetchData();
   }, [navigate]);
+
+  useEffect(() => {
+    const fetchQuizDetails = async () => {
+      try {
+        const userDataString = localStorage.getItem('userData');
+        if (!userDataString) {
+          navigate('/login');
+          return;
+        }
+
+        const userData = JSON.parse(userDataString);
+
+        const response = await fetch(`${API}/api/Quiz/quizzes/`, {
+          headers: {
+            "Authorization": `Token ${userData.token}`,
+          },
+        });
+
+        if (!response.ok) {
+          throw new Error("Failed to fetch quiz details");
+        }
+
+        const quizzes = await response.json();
+        const quiz = quizzes.find(q => q.title === quizData.title);
+        if (quiz) {
+          setQuizData(prev => ({ ...prev, id: quiz.id }));
+        }
+      } catch (err) {
+        console.error("Error fetching quiz details:", err);
+      }
+    };
+
+    fetchQuizDetails();
+  }, [quizData.title]);
 
   const getGroupCardClass = (groupsLength) => {
     if (groupsLength === 0) return 'card groups-card empty';

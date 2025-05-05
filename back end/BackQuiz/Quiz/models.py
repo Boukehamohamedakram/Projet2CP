@@ -40,27 +40,13 @@ class Quiz(models.Model):
     end_time = models.DateTimeField(null=True, blank=True)
     category = models.CharField(max_length=20, choices=CATEGORY_CHOICES, default='math')
     max_attempts = models.PositiveIntegerField(default=1, help_text="Maximum number of attempts allowed per student")
+    is_active = models.BooleanField(default=True)  # Ensure the field exists
 
-    
-    @property
-    def is_active(self):
-        """Check if the quiz is currently active based on time"""
-        now = timezone.now()
-        
-        # If no start/end times are set, quiz is always active
-        if not self.start_time and not self.end_time:
-            return True
-            
-        # If only start_time is set
-        if self.start_time and not self.end_time:
-            return now >= self.start_time
-            
-        # If only end_time is set
-        if not self.start_time and self.end_time:
-            return now <= self.end_time
-            
-        # If both are set
-        return self.start_time <= now <= self.end_time
+    def save(self, *args, **kwargs):
+        # Hardcode is_active to True
+        self.is_active = True
+        super().save(*args, **kwargs)
+
 
 class QuizAttempt(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE, related_name='attempts')

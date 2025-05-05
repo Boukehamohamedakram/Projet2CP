@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer, QuizResultDetailSerializer, StudentQuizHistorySerializer
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 from rest_framework.views import APIView
+from rest_framework import serializers
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -207,53 +208,15 @@ class QuizSubmitView(generics.GenericAPIView):
                 status=status.HTTP_404_NOT_FOUND
             )
 
-class QuestionListCreateView(generics.ListCreateAPIView):
-    serializer_class = QuestionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTeacher]  # Teacher only
-
-    def get_queryset(self):
-        quiz_id = self.kwargs.get('quiz_id', None)
-        if quiz_id:
-            return Question.objects.filter(quiz_id=quiz_id)
-        return Question.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        # Make a mutable copy of the request data
-        data = request.data.copy()
-        
-        # Extract options data from the copy
-        options_data = data.pop('options', [])
-        
-        # Create the question first
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        question = serializer.save()
-        
-        # Now create options for this question
-        has_correct_option = False
-        for option_data in options_data:
-            option_data['question'] = question.id
-            option_serializer = OptionSerializer(data=option_data)
-            if option_serializer.is_valid():
-                option = option_serializer.save()
-                if option.is_correct:
-                    has_correct_option = True
-        
-        # Validate that at least one option is marked as correct
-        if not has_correct_option and options_data:
-            question.delete()  # Delete the question if no correct option
-            return Response(
-                {"error": "At least one option must be marked as correct."},
-                status=status.HTTP_400_BAD_REQUEST
-            )
-        
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
 
 class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+class QuestionCreateView(generics.CreateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
 
 # Option views
 class OptionListCreateView(generics.ListCreateAPIView):
@@ -488,4 +451,33 @@ class AbsentStudentsView(APIView):
             return Response({"absent_students": data}, status=200)
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=404)
+
+class QuizQuestionsCreateView(generics.CreateAPIView):
+    serializer_class = QuestionSerializer
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def create(self, request, *args, **kwargs):
+        quiz_id = self.kwargs.get('quiz_id')
+
+        # Ensure the quiz exists
+        try:
+            quiz = Quiz.objects.get(pk=quiz_id)
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Add the quiz ID to each question in the payload
+        questions_data = request.data.get('questions', [])
+        if not questions_data:
+            return Response({"error": "No questions provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        created_questions = []
+        for question_data in questions_data:
+            question_data['quiz'] = quiz.id  # Associate the question with the quiz
+            serializer = self.get_serializer(data=question_data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            created_questions.append(serializer.data)
+
+        return Response({"quiz": quiz_id, "questions": created_questions}, status=status.HTTP_201_CREATED)
+
 

@@ -13,8 +13,6 @@ export default function LoginPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    console.log("Login attempted with:", { username, password });
-
     try {
       const response = await fetch(`${API}/api/users/login/`, {
         method: "POST",
@@ -24,22 +22,13 @@ export default function LoginPage() {
 
       if (response.ok) {
         const data = await response.json();
-        console.log("Login successful:", data);
-        
-        // Store token and userId
-        localStorage.setItem("token", data.token);
-        localStorage.setItem("userId", data.id.toString());
-        localStorage.setItem("username", username);
-        
-        // Redirect to home page using navigate
-        navigate('/home');
+        localStorage.setItem("userData", JSON.stringify(data)); // Store token and user info
+        navigate('/dashboard');
       } else {
         const errorData = await response.json();
-        console.error("Login failed:", errorData);
         setError(errorData.detail || "Invalid username or password");
       }
     } catch (err) {
-      console.error("Error during login:", err);
       setError("Network error. Please try again.");
     }
   };

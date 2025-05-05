@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     QuizListCreateView, QuizDetailView, AssignedQuizListView,
-    QuestionListCreateView, QuestionDetailView,
+    QuestionCreateView, QuestionDetailView,
     OptionListCreateView, OptionDetailView,
     StudentAnswerListCreateView, StudentAnswerDetailView,
     ResultListView,
@@ -10,7 +10,8 @@ from .views import (
     StudentQuizQuestionsView, StudentQuestionOptionsView,
     StudentQuizResultDetailView,
     QuizSubmitView,
-    AbsentStudentsView
+    AbsentStudentsView,
+    QuizQuestionsCreateView
 )
 
 urlpatterns = [
@@ -22,9 +23,10 @@ urlpatterns = [
         
         # Student-specific quiz structure URLs
         path('quizzes/<int:quiz_id>/questions/', StudentQuizQuestionsView.as_view(), name='student-quiz-questions'),
+        path('quizzes/<int:quiz_id>/questions/create/', QuizQuestionsCreateView.as_view(), name='quiz-questions-create'),
         
         # Question URLs
-        path('questions/', QuestionListCreateView.as_view(), name='question-list-create'),
+        path('questions/', QuestionCreateView.as_view(), name='question-list-create'),
         path('questions/<int:pk>/', QuestionDetailView.as_view(), name='question-detail'),
         
         # Option URLs
