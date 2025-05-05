@@ -15,5 +15,7 @@ bar char  x groups y average
 
 
 
-
-3la hssab time limit and  max attemmpts student dymn assigned but submit answers thbess
+mzl create groupe 
+result 3nd teacher 
+test analytics t
+test mob front back

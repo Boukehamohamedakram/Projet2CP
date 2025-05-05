@@ -1,7 +1,7 @@
 /* QuizPILogin.css */
 
 .login-page-container {
-  background-image: url("src/assets/Log in - Wrong pwd.png");
+  background-image: url("src/assets/login.png");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
@@ -132,7 +132,7 @@
   outline: none;
 }
 
-.password-input-wrapper {
+.passworde-input-wrapper {
   position: relative;
   display: flex;
   align-items: center;
@@ -143,13 +143,13 @@
   background: #e9f6fe;
 }
 
-.password-input-wrapper .input-control {
+.passworde-input-wrapper .input-control {
   padding: 0 2.5rem 0 1rem;
   border-radius: 1.125rem;
   box-sizing: border-box;
 }
 
-.toggle-password {
+.toggle-passworde {
   position: absolute;
   right: 1rem;
   cursor: pointer;
@@ -159,11 +159,11 @@
   justify-content: center;
 }
 
-.toggle-password:hover {
+.toggle-passworde:hover {
   color: #31bce2;
 }
 
-.forgot-password-link {
+.forgot-passworde-link {
   color: #5d5d5d;
   font-size: 0.85rem;
   margin: -0.5rem 0 2rem 12rem;
@@ -172,7 +172,7 @@
   font-family: "Georgia", serif;
 }
 
-.forgot-password-link:hover {
+.forgot-passworde-link:hover {
   color: #0664ae;
   text-decoration: underline;
 }
@@ -263,7 +263,7 @@
   }
 
   .input-field,
-  .password-input-wrapper {
+  .passworde-input-wrapper {
     height: 2rem;
   }
 }
@@ -287,11 +287,11 @@
     margin-bottom: 0.75rem;
   }
 
-  .forgot-password-container {
+  .forgot-passworde-container {
     margin-bottom: 1rem;
   }
 
-  .forgot-password-link {
+  .forgot-passworde-link {
     font-size: 11px;
   }
 }

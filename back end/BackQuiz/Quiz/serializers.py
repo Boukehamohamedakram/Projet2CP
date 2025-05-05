@@ -1,19 +1,17 @@
-from rest_framework import serializers, generics, permissions
+from rest_framework import serializers
 from .models import Quiz, Question, Option, StudentAnswer, Result, Group, User, QuizAttempt
 from django.contrib.auth import get_user_model
-from django.db import models
-from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 User = get_user_model()  # ✅ Fetch the actual User model dynamically
 
 
 class OptionSerializer(serializers.ModelSerializer):
     class Meta:
         model = Option
-        fields = ['id', 'question', 'text', 'is_correct']
+        fields = ['id', 'text', 'is_correct']
         
 
 class QuestionSerializer(serializers.ModelSerializer):
-    options = OptionSerializer(many=True, required=False)
+    options = OptionSerializer(many=True, required=True)  # Nested options
 
     class Meta:
         model = Question
@@ -23,11 +21,7 @@ class QuestionSerializer(serializers.ModelSerializer):
         options_data = validated_data.pop('options', [])
         question = Question.objects.create(**validated_data)
 
-        # Ensure MCQ & True/False have at least one correct option
-        if question.question_type in ['mcq', 'tf']:
-            if not any(option['is_correct'] for option in options_data):
-                raise serializers.ValidationError("At least one correct option is required for MCQ/TF.")
-
+        # Create options for the question
         for option_data in options_data:
             Option.objects.create(question=question, **option_data)
 
@@ -42,6 +36,7 @@ class GroupSerializer(serializers.ModelSerializer):
     class Meta:
         model = Group
         fields = ['id', 'name', 'teacher', 'students']
+
 class QuizSerializer(serializers.ModelSerializer):
     questions = QuestionSerializer(many=True, read_only=True)
     assigned_students = serializers.PrimaryKeyRelatedField(
@@ -61,14 +56,18 @@ class QuizSerializer(serializers.ModelSerializer):
             'id', 'title', 'description', 'teacher',
             'assigned_students', 'assigned_groups',
             'time_limit', 'is_published', 'category', 'questions',
-            
-                 'start_time', 'end_time', 'is_active','max_attempts'
+            'start_time', 'end_time', 'is_active', 'max_attempts'
         ]
 
     def create(self, validated_data):
         # Extract assigned students and groups from the request
         assigned_students = validated_data.pop('assigned_students', [])
         assigned_groups = validated_data.pop('assigned_groups', [])
+
+        # Automatically set the teacher field from the request user
+        request = self.context.get('request')
+        if request and hasattr(request, 'user'):
+            validated_data['teacher'] = request.user
 
         # Create the quiz instance
         quiz = Quiz.objects.create(**validated_data)
@@ -80,14 +79,20 @@ class QuizSerializer(serializers.ModelSerializer):
         return quiz
 
     def update(self, instance, validated_data):
-        # Update fields directly
+        # Extract assigned students and groups from the request
+        assigned_students = validated_data.pop('assigned_students', None)
+        assigned_groups = validated_data.pop('assigned_groups', None)
+
+        # Update quiz attributes
         for attr, value in validated_data.items():
-            if attr == 'assigned_students':
-                instance.assigned_students.set(value)  # Use .set() for ManyToManyField
-            elif attr == 'assigned_groups':
-                instance.assigned_groups.set(value)  # Use .set() for ManyToManyField
-            else:
-                setattr(instance, attr, value)
+            setattr(instance, attr, value)
+
+        # Manually update assigned students and groups
+        if assigned_students is not None:
+            instance.assigned_students.set(assigned_students)
+        if assigned_groups is not None:
+            instance.assigned_groups.set(assigned_groups)
+
         instance.save()
         return instance
 
@@ -147,6 +152,7 @@ class StudentQuizHistorySerializer(serializers.ModelSerializer):
     def get_can_retake(self, obj):
         attempts_used = self.get_attempts_used(obj)
         return attempts_used < obj.quiz.max_attempts and obj.quiz.is_active
+
 class QuizResultDetailSerializer(serializers.ModelSerializer):
         percentage = serializers.SerializerMethodField()
     
@@ -159,31 +165,3 @@ class QuizResultDetailSerializer(serializers.ModelSerializer):
             if obj.max_score > 0:
                 return round((obj.score / obj.max_score) * 100, 2)
             return 0
-
-
-class AssignedQuizListView(generics.ListAPIView):
-    serializer_class = QuizSerializer
-    permission_classes = [permissions.IsAuthenticated, IsStudent]
-
-    def get_queryset(self):
-        student = self.request.user
-
-        # Get all quizzes assigned to the student
-        assigned_quizzes = Quiz.objects.filter(
-            models.Q(assigned_students=student) | 
-            models.Q(assigned_groups__students=student)
-        ).distinct()
-
-        # Filter out quizzes where the student has used all attempts
-        available_quizzes = []
-        for quiz in assigned_quizzes:
-            attempts_count = QuizAttempt.objects.filter(
-                quiz=quiz,
-                student=student,
-                is_completed=True
-            ).count()
-
-            if attempts_count < quiz.max_attempts and quiz.is_active:
-                available_quizzes.append(quiz.id)
-
-        return Quiz.objects.filter(id__in=available_quizzes)

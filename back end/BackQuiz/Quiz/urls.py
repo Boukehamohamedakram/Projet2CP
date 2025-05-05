@@ -1,7 +1,7 @@
 from django.urls import path
 from .views import (
     QuizListCreateView, QuizDetailView, AssignedQuizListView,
-    QuestionListCreateView, QuestionDetailView,
+    QuestionCreateView, QuestionDetailView,
     OptionListCreateView, OptionDetailView,
     StudentAnswerListCreateView, StudentAnswerDetailView,
     ResultListView,
@@ -11,7 +11,7 @@ from .views import (
     StudentQuizResultDetailView,
     QuizSubmitView,
     AbsentStudentsView,
-    QuizAnalyticsView
+    QuizQuestionsCreateView
 )
 
 urlpatterns = [
@@ -23,9 +23,10 @@ urlpatterns = [
         
         # Student-specific quiz structure URLs
         path('quizzes/<int:quiz_id>/questions/', StudentQuizQuestionsView.as_view(), name='student-quiz-questions'),
+        path('quizzes/<int:quiz_id>/questions/create/', QuizQuestionsCreateView.as_view(), name='quiz-questions-create'),
         
         # Question URLs
-        path('questions/', QuestionListCreateView.as_view(), name='question-list-create'),
+        path('questions/', QuestionCreateView.as_view(), name='question-list-create'),
         path('questions/<int:pk>/', QuestionDetailView.as_view(), name='question-detail'),
         
         # Option URLs
@@ -46,22 +47,14 @@ urlpatterns = [
         path('answers/', StudentAnswerListCreateView.as_view(), name='answer-list-create'),
         path('answers/<int:pk>/', StudentAnswerDetailView.as_view(), name='answer-detail'),
         
-        # Submit answers for a question
-        path('quizzes/<int:quiz_id>/answers/', StudentAnswerListCreateView.as_view(), name='submit-answer'),
-
         # Results URLs
         path('results/', ResultListView.as_view(), name='result-list'),
         # Add this to your urlpatterns
         path('results/<int:pk>/detail/', StudentQuizResultDetailView.as_view(), name='student-quiz-result-detail'),
         # Add this to your urlpatterns
         path('quiz-history/', StudentQuizHistoryView.as_view(), name='student-quiz-history'),
-        
-        # Finalize quiz submission
-        path('quizzes/<int:quiz_id>/submit/', QuizSubmitView.as_view(), name='submit-quiz'),
+        path('quizzes/<int:quiz_id>/submit/', QuizSubmitView.as_view(), name='quiz-submit'),
         
         # Absent students URL
         path('quizzes/<int:quiz_id>/absent-students/', AbsentStudentsView.as_view(), name='absent-students'),
-
-        # Quiz analytics URL
-        path('quizzes/<int:quiz_id>/analytics/', QuizAnalyticsView.as_view(), name='quiz-analytics'),
     ]

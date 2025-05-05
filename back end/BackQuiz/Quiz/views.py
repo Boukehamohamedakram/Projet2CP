@@ -7,7 +7,7 @@ from django.contrib.auth import get_user_model
 from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, StudentAnswerSerializer, ResultSerializer, GroupSerializer, QuizResultDetailSerializer, StudentQuizHistorySerializer
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 from rest_framework.views import APIView
-from django.db.models import Avg, Count, F, Q
+from rest_framework import serializers
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -32,15 +32,13 @@ class AssignedQuizListView(generics.ListAPIView):
 
     def get_queryset(self):
         student = self.request.user
-        print(f"Student: {student}")
-
+        
         # Get all quizzes assigned to the student
         assigned_quizzes = Quiz.objects.filter(
             models.Q(assigned_students=student) | 
             models.Q(assigned_groups__students=student)
         ).distinct()
-        print(f"Assigned Quizzes: {assigned_quizzes}")
-
+        
         # Filter out quizzes where the student has used all attempts
         available_quizzes = []
         for quiz in assigned_quizzes:
@@ -49,31 +47,29 @@ class AssignedQuizListView(generics.ListAPIView):
                 student=student,
                 is_completed=True
             ).count()
-            print(f"Quiz: {quiz.title}, Attempts Count: {attempts_count}, Max Attempts: {quiz.max_attempts}, Is Active: {quiz.is_active}")
-
+            
             if attempts_count < quiz.max_attempts and quiz.is_active:
                 available_quizzes.append(quiz.id)
-
-        print(f"Available Quizzes: {available_quizzes}")
+                
         return Quiz.objects.filter(id__in=available_quizzes)
 
 class QuizDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Quiz.objects.all()
     serializer_class = QuizSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacherOrReadOnly]
-
+    
     def perform_update(self, serializer):
         # Save the quiz with core fields
         quiz = serializer.save()
-
-        # Handle assigned students and groups manually
-        assigned_students = serializer.validated_data.get('assigned_students', None)
-        if assigned_students is not None:
-            quiz.assigned_students.set(assigned_students)  # Use .set() for ManyToManyField
-
-        assigned_groups = serializer.validated_data.get('assigned_groups', None)
-        if assigned_groups is not None:
-            quiz.assigned_groups.set(assigned_groups)  # Use .set() for ManyToManyField
+        
+        # Handle assigned students and groups manually to prevent auto-selection
+        if 'assigned_students' in serializer.validated_data:
+            assigned_students = serializer.validated_data.get('assigned_students', [])
+            quiz.assigned_students.set(assigned_students)
+            
+        if 'assigned_groups' in serializer.validated_data:
+            assigned_groups = serializer.validated_data.get('assigned_groups', [])
+            quiz.assigned_groups.set(assigned_groups)
 
 # Student-specific views for accessing quiz structure
 class StudentQuizQuestionsView(generics.ListAPIView):
@@ -157,100 +153,70 @@ class StudentQuestionOptionsView(generics.ListAPIView):
 
 class QuizSubmitView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStudent]
-
+    
     def post(self, request, quiz_id):
         try:
             quiz = Quiz.objects.get(pk=quiz_id)
             student = request.user
-
-            # Check if student has attempts remaining
+            
+            # Check if student can submit this quiz
             attempts_count = QuizAttempt.objects.filter(
                 quiz=quiz,
                 student=student,
                 is_completed=True
             ).count()
-
+            
             if attempts_count >= quiz.max_attempts:
-                return Response({"error": "You have used all your allowed attempts."}, status=status.HTTP_403_FORBIDDEN)
-
+                return Response(
+                    {"error": "You have used all your allowed attempts for this quiz."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
             # Get or create the current attempt
-            current_attempt, _ = QuizAttempt.objects.get_or_create(
+            current_attempt, created = QuizAttempt.objects.get_or_create(
                 quiz=quiz,
                 student=student,
                 is_completed=False,
                 defaults={'attempt_number': attempts_count + 1}
             )
-
-            # Mark the attempt as completed
+            
+            # Mark current attempt as completed
             current_attempt.is_completed = True
             current_attempt.completed_at = timezone.now()
             current_attempt.save()
-
-            # Calculate the score
-            result, _ = Result.objects.get_or_create(
+            
+            # Calculate score for this attempt
+            result, created = Result.objects.get_or_create(
                 quiz=quiz,
                 student=student,
                 defaults={'score': 0, 'max_score': quiz.questions.aggregate(total_points=models.Sum('points'))['total_points']}
             )
             result.calculate_score()
-
+            
             return Response({
                 "message": "Quiz submitted successfully.",
+                "attempt_number": current_attempt.attempt_number,
+                "attempts_remaining": max(0, quiz.max_attempts - attempts_count - 1),
                 "score": result.score,
                 "max_score": result.max_score,
                 "percentage": round((result.score / result.max_score * 100) if result.max_score > 0 else 0, 2)
             })
-
+            
         except Quiz.DoesNotExist:
-            return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
-
-class QuestionListCreateView(generics.ListCreateAPIView):
-    serializer_class = QuestionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsTeacher]  # Teacher only
-
-    def get_queryset(self):
-        quiz_id = self.kwargs.get('quiz_id', None)
-        if quiz_id:
-            return Question.objects.filter(quiz_id=quiz_id)
-        return Question.objects.all()
-
-    def create(self, request, *args, **kwargs):
-        # Make a mutable copy of the request data
-        data = request.data.copy()
-        
-        # Extract options data from the copy
-        options_data = data.pop('options', [])
-        
-        # Create the question first
-        serializer = self.get_serializer(data=data)
-        serializer.is_valid(raise_exception=True)
-        question = serializer.save()
-        
-        # Now create options for this question
-        has_correct_option = False
-        for option_data in options_data:
-            option_data['question'] = question.id
-            option_serializer = OptionSerializer(data=option_data)
-            if option_serializer.is_valid():
-                option = option_serializer.save()
-                if option.is_correct:
-                    has_correct_option = True
-        
-        # Validate that at least one option is marked as correct
-        if not has_correct_option and options_data:
-            question.delete()  # Delete the question if no correct option
             return Response(
-                {"error": "At least one option must be marked as correct."},
-                status=status.HTTP_400_BAD_REQUEST
+                {"error": "Quiz not found."},
+                status=status.HTTP_404_NOT_FOUND
             )
-        
-        headers = self.get_success_headers(serializer.data)
-        return Response(serializer.data, status=status.HTTP_201_CREATED, headers=headers)
+
 
 class QuestionDetailView(generics.RetrieveUpdateDestroyAPIView):
     queryset = Question.objects.all()
     serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+class QuestionCreateView(generics.CreateAPIView):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
 
 # Option views
 class OptionListCreateView(generics.ListCreateAPIView):
@@ -274,51 +240,51 @@ class StudentAnswerListCreateView(generics.ListCreateAPIView):
         return StudentAnswer.objects.filter(student=self.request.user)
 
     def create(self, request, *args, **kwargs):
+        # Get question and check if its quiz is still active
         question_id = request.data.get('question')
-        selected_option_id = request.data.get('selected_option')
-        text_answer = request.data.get('text_answer')
-
         try:
             question = Question.objects.get(pk=question_id)
             quiz = question.quiz
             student = request.user
-
-            # Check if quiz is active
+            
+            # Check if quiz is active for submission
             if not quiz.is_active:
-                return Response({"error": "This quiz is no longer active."}, status=status.HTTP_403_FORBIDDEN)
-
+                return Response(
+                    {"error": "This quiz is no longer active. You cannot submit answers."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+                
             # Check if student has attempts remaining
             attempts_count = QuizAttempt.objects.filter(
                 quiz=quiz,
                 student=student,
                 is_completed=True
             ).count()
-
+            
             if attempts_count >= quiz.max_attempts:
-                return Response({"error": "You have used all your allowed attempts."}, status=status.HTTP_403_FORBIDDEN)
-
+                return Response(
+                    {"error": "You have used all your allowed attempts for this quiz."},
+                    status=status.HTTP_403_FORBIDDEN
+                )
+            
             # Get or create the current attempt
-            current_attempt, _ = QuizAttempt.objects.get_or_create(
+            current_attempt, created = QuizAttempt.objects.get_or_create(
                 quiz=quiz,
                 student=student,
                 is_completed=False,
                 defaults={'attempt_number': attempts_count + 1}
             )
-
-            # Save the answer
-            answer, created = StudentAnswer.objects.update_or_create(
-                student=student,
-                question=question,
-                defaults={
-                    'selected_option_id': selected_option_id,
-                    'text_answer': text_answer
-                }
-            )
-
-            return Response({"message": "Answer saved successfully."}, status=status.HTTP_201_CREATED)
-
+                
+            # Continue with normal creation process
+            return super().create(request, *args, **kwargs)
+            
         except Question.DoesNotExist:
-            return Response({"error": "Question not found."}, status=status.HTTP_404_NOT_FOUND)
+            return Response(
+                {"error": "Question not found."},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        
+        
 
 class StudentAnswerDetailView(generics.RetrieveAPIView):
     queryset = StudentAnswer.objects.all()
@@ -486,66 +452,32 @@ class AbsentStudentsView(APIView):
         except Quiz.DoesNotExist:
             return Response({"error": "Quiz not found."}, status=404)
 
-
-class QuizAnalyticsView(APIView):
+class QuizQuestionsCreateView(generics.CreateAPIView):
+    serializer_class = QuestionSerializer
     permission_classes = [permissions.IsAuthenticated, IsTeacher]
 
-    def get(self, request, quiz_id):
+    def create(self, request, *args, **kwargs):
+        quiz_id = self.kwargs.get('quiz_id')
+
+        # Ensure the quiz exists
         try:
             quiz = Quiz.objects.get(pk=quiz_id)
-
-            # Total students assigned to the quiz
-            total_students = quiz.assigned_students.count()
-
-            # Students who submitted the quiz
-            submitted_students = Result.objects.filter(quiz=quiz).count()
-
-            # Completion rate
-            completion_rate = (submitted_students / total_students * 100) if total_students > 0 else 0
-
-            # Average score
-            average_score = Result.objects.filter(quiz=quiz).aggregate(Avg('score'))['score__avg'] or 0
-
-            # Top students
-            top_students = Result.objects.filter(quiz=quiz).order_by('-score')[:5]
-            top_students_data = [
-                {
-                    "id": result.student.id,
-                    "username": result.student.username,
-                    "score": result.score
-                }
-                for result in top_students
-            ]
-
-            # Hardest question (most students got wrong)
-            hardest_question = (
-                StudentAnswer.objects.filter(question__quiz=quiz)
-                .values('question')
-                .annotate(
-                    total_attempts=Count('id'),
-                    wrong_attempts=Count('id', filter=Q(selected_option__is_correct=False))
-                )
-                .order_by('-wrong_attempts')
-                .first()
-            )
-            hardest_question_data = None
-            if hardest_question:
-                question = Question.objects.get(pk=hardest_question['question'])
-                hardest_question_data = {
-                    "id": question.id,
-                    "text": question.text,
-                    "wrong_attempts": hardest_question['wrong_attempts'],
-                    "total_attempts": hardest_question['total_attempts']
-                }
-
-            # Return analytics data
-            return Response({
-                "completion_rate": round(completion_rate, 2),
-                "average_score": round(average_score, 2),
-                "top_students": top_students_data,
-                "hardest_question": hardest_question_data
-            }, status=200)
-
         except Quiz.DoesNotExist:
-            return Response({"error": "Quiz not found."}, status=404)
+            return Response({"error": "Quiz not found."}, status=status.HTTP_404_NOT_FOUND)
+
+        # Add the quiz ID to each question in the payload
+        questions_data = request.data.get('questions', [])
+        if not questions_data:
+            return Response({"error": "No questions provided."}, status=status.HTTP_400_BAD_REQUEST)
+
+        created_questions = []
+        for question_data in questions_data:
+            question_data['quiz'] = quiz.id  # Associate the question with the quiz
+            serializer = self.get_serializer(data=question_data)
+            serializer.is_valid(raise_exception=True)
+            self.perform_create(serializer)
+            created_questions.append(serializer.data)
+
+        return Response({"quiz": quiz_id, "questions": created_questions}, status=status.HTTP_201_CREATED)
+
 
