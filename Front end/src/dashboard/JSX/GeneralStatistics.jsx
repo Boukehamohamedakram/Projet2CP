@@ -27,6 +27,19 @@ export default function GeneralStatistics() {
   });
   const [searchTerm, setSearchTerm] = useState('');
   const [quizData, setQuizData] = useState({ title: '', id: null });
+  const [debugInfo, setDebugInfo] = useState({
+    userData: null,
+    groupsResponse: null,
+    quizzesResponse: null
+  });
+
+  const logDebugInfo = (type, data) => {
+    setDebugInfo(prev => ({
+      ...prev,
+      [type]: data
+    }));
+    console.log(`Debug ${type}:`, data);
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -38,39 +51,43 @@ export default function GeneralStatistics() {
         }
 
         const userData = JSON.parse(userDataString);
-        const token = userData.token;
+        const headers = {
+          "Content-Type": "application/json",
+          "Authorization": `Token ${userData.token}`
+        };
 
+        // Fetch groups
         const groupResponse = await fetch(`${API}/api/Quiz/groups/`, {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Token ${token}`,
-          },
+          headers: headers
         });
 
         if (!groupResponse.ok) {
-          throw new Error(`Groups access denied: ${groupResponse.status}`);
+          throw new Error(`Groups fetch failed: ${groupResponse.status}`);
         }
 
         const groupData = await groupResponse.json();
         setGroups(groupData);
 
+        // Fetch quizzes
         const quizResponse = await fetch(`${API}/api/Quiz/quizzes/`, {
           method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Token ${token}`,
-          },
+          headers: headers
         });
 
         if (!quizResponse.ok) {
-          throw new Error(`Quiz access denied: ${quizResponse.status}`);
+          throw new Error(`Quizzes fetch failed: ${quizResponse.status}`);
         }
 
         const quizData = await quizResponse.json();
         setQuizzes(quizData);
+
       } catch (err) {
-        setError({ quizzes: err.message, groups: err.message });
+        console.error('Fetch error:', err);
+        setError({
+          quizzes: err.message,
+          groups: err.message
+        });
       } finally {
         setLoading({
           quizzes: false,
@@ -115,6 +132,25 @@ export default function GeneralStatistics() {
 
     fetchQuizDetails();
   }, [quizData.title]);
+
+  useEffect(() => {
+    const userData = localStorage.getItem('userData');
+    if (!userData) {
+      navigate('/login');
+      return;
+    }
+    
+    try {
+      const parsed = JSON.parse(userData);
+      if (!parsed.token) {
+        navigate('/login');
+        return;
+      }
+    } catch (err) {
+      console.error('Invalid userData in localStorage:', err);
+      navigate('/login');
+    }
+  }, [navigate]);
 
   const getGroupCardClass = (groupsLength) => {
     if (groupsLength === 0) return 'card groups-card empty';
@@ -164,10 +200,11 @@ export default function GeneralStatistics() {
               {loading.groups ? (
                 <div className="loading">Loading groups...</div>
               ) : error.groups ? (
-                <div className="error">{error.groups}</div>
-              ) : groups.length === 0 ? (
-                <div className="no-data">No groups available</div>
-              ) : (
+                <div className="error">
+                  <p>Error: {error.groups}</p>
+                  <small>Please try refreshing the page</small>
+                </div>
+              ) : groups && groups.length > 0 ? (
                 groups.map((group) => (
                   <div key={group.id} className="item">
                     <div className="item-info">
@@ -175,11 +212,13 @@ export default function GeneralStatistics() {
                         <strong>Group: {group.name}</strong>
                       </div>
                       <div className="item-text">
-                        Number of students: {group.students?.length || 0}
+                        Students: {group.students?.length || 0}
                       </div>
                     </div>
                   </div>
                 ))
+              ) : (
+                <div className="no-data">No groups available</div>
               )}
             </div>
           </div>

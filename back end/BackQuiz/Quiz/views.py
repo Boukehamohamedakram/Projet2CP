@@ -8,6 +8,7 @@ from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, S
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 from rest_framework.views import APIView
 from rest_framework import serializers
+from django.db.models import Avg, Count, F, Q
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -481,3 +482,64 @@ class QuizQuestionsCreateView(generics.CreateAPIView):
         return Response({"quiz": quiz_id, "questions": created_questions}, status=status.HTTP_201_CREATED)
 
 
+class QuizAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def get(self, request, quiz_id):
+        try:
+            quiz = Quiz.objects.get(pk=quiz_id)
+
+            # Total students assigned to the quiz
+            total_students = quiz.assigned_students.count()
+
+            # Students who submitted the quiz
+            submitted_students = Result.objects.filter(quiz=quiz).count()
+
+            # Completion rate
+            completion_rate = (submitted_students / total_students * 100) if total_students > 0 else 0
+
+            # Average score
+            average_score = Result.objects.filter(quiz=quiz).aggregate(Avg('score'))['score__avg'] or 0
+
+            # Top students
+            top_students = Result.objects.filter(quiz=quiz).order_by('-score')[:5]
+            top_students_data = [
+                {
+                    "id": result.student.id,
+                    "username": result.student.username,
+                    "score": result.score
+                }
+                for result in top_students
+            ]
+
+            # Hardest question (most students got wrong)
+            hardest_question = (
+                StudentAnswer.objects.filter(question__quiz=quiz)
+                .values('question')
+                .annotate(
+                    total_attempts=Count('id'),
+                    wrong_attempts=Count('id', filter=Q(selected_option__is_correct=False))
+                )
+                .order_by('-wrong_attempts')
+                .first()
+            )
+            hardest_question_data = None
+            if hardest_question:
+                question = Question.objects.get(pk=hardest_question['question'])
+                hardest_question_data = {
+                    "id": question.id,
+                    "text": question.text,
+                    "wrong_attempts": hardest_question['wrong_attempts'],
+                    "total_attempts": hardest_question['total_attempts']
+                }
+
+            # Return analytics data
+            return Response({
+                "completion_rate": round(completion_rate, 2),
+                "average_score": round(average_score, 2),
+                "top_students": top_students_data,
+                "hardest_question": hardest_question_data
+            }, status=200)
+
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found."}, status=404)

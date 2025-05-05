@@ -26,7 +26,7 @@ function App() {
         <Route path="/create/:id" element={<Quizzes />} />
         <Route path="/create" element={<Quizzes />} />
         <Route path="/dashboard" element={<GeneralStatistics />} />
-        <Route path="/quiz-statistics" element={<QuizStatistics />} />
+        <Route path="/quiz-statistics/:id" element={<QuizStatistics />} />
         <Route path="/navbar" element={<NavBar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/scheduled" element={<Scheduled />} />

@@ -1,13 +1,13 @@
 import { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
-import "../CSS/QuizStatistics.css"; 
+import NavBar from "../../components/NavBar";
+import Footer from "../../components/Footer";
+import "../CSS/QuizStatistics.css";
 
 function QuizStatistics() {
   const navigate = useNavigate();
   const { id } = useParams();
-  
-  // Add state for quiz data
+
   const [quizData, setQuizData] = useState({
     title: '',
     topStudents: [],
@@ -33,36 +33,40 @@ function QuizStatistics() {
           return;
         }
 
-        // Updated endpoint to match Django URL structure
-        const response = await fetch(`http://localhost:8000/api/Quiz/results/${id}/`, {
+        const analyticsResponse = await fetch(`http://localhost:8000/api/Quiz/quizzes/${id}/analytics/`, {
           headers: {
             'Authorization': `Token ${userData.token}`,
             'Content-Type': 'application/json'
           }
         });
 
-        if (!response.ok) {
-          const errorText = await response.text();
-          console.error('API Error:', {
-            status: response.status,
-            statusText: response.statusText,
-            body: errorText,
-            endpoint: `http://localhost:8000/api/Quiz/results/${id}/`
-          });
-          throw new Error(`Failed to fetch quiz statistics: ${response.status}`);
+        if (!analyticsResponse.ok) {
+          throw new Error(`Failed to fetch quiz analytics: ${analyticsResponse.status}`);
         }
 
-        const data = await response.json();
-        console.log('Quiz statistics data:', data);
+        const analyticsData = await analyticsResponse.json();
+
+        const absentResponse = await fetch(`http://localhost:8000/api/Quiz/quizzes/${id}/absent-students/`, {
+          headers: {
+            'Authorization': `Token ${userData.token}`,
+            'Content-Type': 'application/json'
+          }
+        });
+
+        if (!absentResponse.ok) {
+          throw new Error(`Failed to fetch absent students: ${absentResponse.status}`);
+        }
+
+        const absentData = await absentResponse.json();
 
         setQuizData({
-          title: data.title || 'Quiz Results',
-          topStudents: data.top_students || [],
-          absentStudents: data.absent_students || [],
-          badQuestions: data.bad_questions || [],
-          gradeDistribution: data.grade_distribution || [],
-          average: data.average || 0,
-          completionRate: data.completion_rate || 0
+          title: analyticsData.title || 'Quiz Results',
+          topStudents: analyticsData.top_students || [],
+          absentStudents: absentData.absent_students || [],
+          badQuestions: analyticsData.hardest_question ? [analyticsData.hardest_question] : [],
+          gradeDistribution: analyticsData.grade_distribution || [],
+          average: analyticsData.average_score || 0,
+          completionRate: analyticsData.completion_rate || 0
         });
 
       } catch (err) {
@@ -76,31 +80,75 @@ function QuizStatistics() {
     fetchQuizStatistics();
   }, [id, navigate]);
 
-  // Handle loading state
   if (loading) {
-    return <div className="quiz-statistics">
-      <div className="loading">Loading quiz statistics...</div>
-    </div>;
-  }
-
-  // Handle error state
-  if (error) {
-    return <div className="quiz-statistics">
-      <div className="error">
-        {error}
-        <button onClick={() => navigate('/dashboard')} className="back-button">
-          Back to Dashboard
-        </button>
+    return (
+      <div className="quiz-statistics">
+        <NavBar />
+        <div className="loading">Loading quiz statistics...</div>
+        <Footer />
       </div>
-    </div>;
+    );
   }
 
-  // Rest of your rendering code...
+  if (error) {
+    return (
+      <div className="quiz-statistics">
+        <NavBar />
+        <div className="error">
+          {error}
+          <button onClick={() => navigate('/dashboard')} className="back-button">
+            Back to Dashboard
+          </button>
+        </div>
+        <Footer />
+      </div>
+    );
+  }
+
   return (
-    <div className="quiz-statistics">
-      <h1 className="title">{quizData.title}</h1>
-      {/* ... existing JSX using quizData instead of hardcoded values ... */}
-    </div>
+    <>
+      <NavBar />
+      <div className="quiz-statistics">
+        <h1 className="title">{quizData.title}</h1>
+        <div className="statistics-section">
+          <div className="important-statistics">
+            <h2>Important Statistics</h2>
+            <p>Average: {quizData.average}</p>
+            <p>Completion Rate: {quizData.completionRate}%</p>
+          </div>
+          <div className="top-students">
+            <h2>Top Students</h2>
+            <ul>
+              {quizData.topStudents.map(student => (
+                <li key={student.id}>{student.username} - {student.score}</li>
+              ))}
+            </ul>
+          </div>
+          <div className="bad-questions">
+            <h2>Bad Performance Questions</h2>
+            {quizData.badQuestions.length > 0 ? (
+              quizData.badQuestions.map((question, index) => (
+                <div key={index}>
+                  <p>Question: {question.text}</p>
+                  <p>Wrong Attempts: {question.wrong_attempts}</p>
+                </div>
+              ))
+            ) : (
+              <p>No data available</p>
+            )}
+          </div>
+          <div className="absent-students">
+            <h2>Absent Students</h2>
+            <ul>
+              {quizData.absentStudents.map(student => (
+                <li key={student.id}>{student.username} - {student.email}</li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
+      <Footer />
+    </>
   );
 }
 
