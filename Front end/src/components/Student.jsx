@@ -7,7 +7,6 @@ import { useNavigate } from "react-router-dom";
 
 // Assets
 import searchIcon from "../assets/search-icon.png";
-import studentAvatar from "../assets/Avatar.png";
 
 export default function Student() {
   const [students, setStudents] = useState([]);
@@ -417,7 +416,7 @@ export default function Student() {
               <h2>Add New Student</h2>
               <div className="form-group">
                 <label className="form-label">Enter student username:</label>
-                <div className="input-field">
+                <div className="input-field1">
                   <input
                     type="text"
                     value={newStudent.username}
@@ -436,7 +435,7 @@ export default function Student() {
 
               <div className="form-group">
                 <label className="form-label">Enter student email:</label>
-                <div className="input-field">
+                <div className="input-field1">
                   <input
                     type="email"
                     value={newStudent.email}
@@ -481,7 +480,7 @@ export default function Student() {
               <h2>Manage Student</h2>
               <div className="form-group">
                 <label className="form-label">Username:</label>
-                <div className="input-field">
+                <div className="input-field1">
                   <input
                     type="text"
                     value={selectedStudent.username}
@@ -499,7 +498,7 @@ export default function Student() {
 
               <div className="form-group">
                 <label className="form-label">Email:</label>
-                <div className="input-field">
+                <div className="input-field1">
                   <input
                     type="email"
                     value={selectedStudent.email}
@@ -546,11 +545,6 @@ export default function Student() {
             filteredStudents.map((student) => (
               <div key={student.id} className="student-row">
                 <div className="student-card">
-                  <img
-                    src={studentAvatar}
-                    alt={student.name}
-                    className="student-avatar"
-                  />
                   <span className="student-name">{student.name}</span>
                   <span className="student-class">{student.class}</span>
                   <span className="student-id">{student.studentId}</span>
@@ -591,7 +585,7 @@ export default function Student() {
               <h2>Create New Group</h2>
               <div className="form-group">
                 <label className="form-label">Group Name:</label>
-                <div className="input-field">
+                <div className="input-field1">
                   <input
                     type="text"
                     value={newGroup.name}
