@@ -241,6 +241,38 @@ export default function Student() {
     }
   };
 
+  // Function to delete student
+  const handleDeleteStudent = async (studentId) => {
+    if (!window.confirm('Are you sure you want to delete this student?')) {
+      return;
+    }
+
+    try {
+      const token = getAuthToken();
+      
+      const response = await axios.delete(
+        `${API}/api/users/users/${studentId}/`,
+        {
+          headers: {
+            'Authorization': `Token ${token}`,
+            'Content-Type': 'application/json'
+          }
+        }
+      );
+
+      console.log("Delete response:", response.data);
+      await fetchStudents(); // Refresh the list
+      setError("");
+    } catch (err) {
+      console.error("Error deleting student:", err);
+      if (err.response) {
+        setError(err.response.data.message || "Failed to delete student");
+      } else {
+        setError("Something went wrong. Please try again.");
+      }
+    }
+  };
+
   // Enhanced search function
   const filteredStudents = students.filter(student => {
     const query = searchQuery.toLowerCase().trim();
@@ -445,16 +477,24 @@ export default function Student() {
                   <span className="student-name">{student.name}</span>
                   <span className="student-class">{student.class}</span>
                   <span className="student-id">{student.studentId}</span>
-                  <button 
-                    className="student-manage"
-                    onClick={() => handleManageStudent({
-                      id: student.id,
-                      name: student.name,
-                      email: student.email
-                    })}
-                  >
-                    Manage
-                  </button>
+                  <div className="student-actions-buttons">
+                    <button 
+                      className="student-manage"
+                      onClick={() => handleManageStudent({
+                        id: student.id,
+                        name: student.name,
+                        email: student.email
+                      })}
+                    >
+                      Manage
+                    </button>
+                    <button 
+                      className="student-delete"
+                      onClick={() => handleDeleteStudent(student.id)}
+                    >
+                      Delete
+                    </button>
+                  </div>
                 </div>
               </div>
             ))

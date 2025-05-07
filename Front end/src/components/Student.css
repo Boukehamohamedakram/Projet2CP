@@ -267,6 +267,25 @@
   padding: 0;
 }
 
+.student-actions-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.student-delete {
+  background: #dc3545;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+.student-delete:hover {
+  background: #c82333;
+}
+
 /* Tablet (≤768px) */
 @media (max-width: 768px) {
   .student-header {
@@ -322,6 +341,10 @@
   .student-class,
   .student-id,
   .student-manage {
+    font-size: 0.8rem;
+    padding: 4px 8px;
+  }
+  .student-delete {
     font-size: 0.8rem;
     padding: 4px 8px;
   }

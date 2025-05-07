@@ -85,6 +85,15 @@ export default function Parameters() {
     navigate("/update-user-info");
   };
 
+  const handleLogout = () => {
+    // Clear local storage
+    localStorage.removeItem("token");
+    localStorage.removeItem("userId");
+    
+    // Redirect to login page
+    navigate("/login");
+  };
+
   return (
     <>
       <NavBar />
@@ -114,63 +123,62 @@ export default function Parameters() {
               <button onClick={goToUpdateUserInfo}>
                 Update Profile
               </button>
+              <button onClick={handleLogout} className="logout-button">
+                Logout
+              </button>
             </div>
           </div>
         )}
 
         {view === "editProfile" && (
-          <>
-            <div className="parameters-card">
-              <img
-                src={profile.avatar}
-                alt="avatar"
-                className="parameters-avatar"
-              />
-              <div className="parameters-info">
-                <p>
-                  Full name: <strong>{profile.fullName}</strong>
-                </p>
-                <p>
-                  Email: <strong>{profile.email}</strong>
-                </p>
-              </div>
-              <div className="parameters-upload">
-                <label className="upload-label">
-                  Upload a new picture
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={handleUpload}
-                    className="upload-input"
-                  />
-                </label>
-              </div>
+          <div className="parameters-card">
+            <img
+              src={profile.avatar}
+              alt="avatar"
+              className="parameters-avatar"
+            />
+            <div className="parameters-info">
+              <p>
+                Full name: <strong>{profile.fullName}</strong>
+              </p>
+              <p>
+                Email: <strong>{profile.email}</strong>
+              </p>
+            </div>
+            <div className="parameters-upload">
+              <label className="upload-label">
+                Upload a new picture
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={handleUpload}
+                  className="upload-input"
+                />
+              </label>
             </div>
             <button className="parameters-save" onClick={saveProfile}>
               Save All Changes
             </button>
-          </>
+          </div>
         )}
 
         {view === "changePassword" && (
-          <>
-            <div className="parameters-card parameters-password-card">
-              <div className="parameters-info">
-                <p>
-                  Current password: <strong>{passwords.current}</strong>
-                </p>
-                <p>
-                  New password: <strong>{passwords.new1}</strong>
-                </p>
-                <p>
-                  New password: <strong>{passwords.new2}</strong>
-                </p>
-              </div>
+          <div className="parameters-card parameters-password-card">
+            <div className="parameters-info">
+              <p>
+                Current password: <strong>{passwords.current}</strong>
+              </p>
+              <p>
+                New password: <strong>{passwords.new1}</strong>
+              </p>
+              <p>
+                New password: <strong>{passwords.new2}</strong>
+              </p>
             </div>
             <button className="parameters-save" onClick={savePassword}>
               Save All Changes
             </button>
-          </>
+          </div>
         )}
 
         {view === "successProfile" && (
