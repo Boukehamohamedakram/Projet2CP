@@ -1,24 +1,24 @@
-import React, { useState, useEffect, useRef } from 'react';
-import NavBar from './NavBar';
-import Footer from './Footer';
-import './Student.css';
-import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import React, { useState, useEffect, useRef } from "react";
+import NavBar from "./NavBar";
+import Footer from "./Footer";
+import "./Student.css";
+import axios from "axios";
+import { useNavigate } from "react-router-dom";
 
 // Assets
-import searchIcon from '../assets/search-icon.png';
-import studentAvatar from '../assets/Avatar.png';
+import searchIcon from "../assets/search-icon.png";
+import studentAvatar from "../assets/Avatar.png";
 
 export default function Student() {
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [showAddModal, setShowAddModal] = useState(false);
   const [newStudent, setNewStudent] = useState({
     username: "",
     email: "",
-    role: "student"
+    role: "student",
   });
   const fileInputRef = useRef(null);
   const navigate = useNavigate();
@@ -28,7 +28,13 @@ export default function Student() {
     id: null,
     username: "",
     email: "",
-    role: "student"
+    role: "student",
+  });
+
+  const [showGroupModal, setShowGroupModal] = useState(false);
+  const [newGroup, setNewGroup] = useState({
+    name: "",
+    students: [],
   });
 
   // Get API URL from environment variables
@@ -43,7 +49,7 @@ export default function Student() {
   const fetchStudents = async () => {
     try {
       const token = getAuthToken();
-      
+
       if (!token) {
         setError("Authentication required");
         return;
@@ -51,20 +57,20 @@ export default function Student() {
 
       const response = await axios.get(`${API}/api/users/users/`, {
         headers: {
-          'Authorization': `Token ${token}`,
-          'Content-Type': 'application/json'
-        }
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
       });
 
       // Filter users with role "student" and transform data
       const studentUsers = response.data
-        .filter(user => user.role === "student")
-        .map(user => ({
+        .filter((user) => user.role === "student")
+        .map((user) => ({
           id: user.id,
           name: user.username,
           email: user.email,
-          class: user.class || 'Not Assigned', // Add default value if class is not present
-          studentId: user.student_id || `ST${user.id}` // Add default value if student_id is not present
+          class: user.class || "Not Assigned", // Add default value if class is not present
+          studentId: user.student_id || `ST${user.id}`, // Add default value if student_id is not present
         }));
 
       setStudents(studentUsers);
@@ -104,7 +110,7 @@ export default function Student() {
         username: newStudent.username,
         email: newStudent.email,
         password: "12345678", // Default password
-        role: "student"
+        role: "student",
       };
 
       console.log("Creating student:", payload);
@@ -148,7 +154,7 @@ export default function Student() {
       }
 
       const formData = new FormData();
-      formData.append('file', file);
+      formData.append("file", file);
 
       console.log("Uploading file:", file.name);
 
@@ -157,9 +163,9 @@ export default function Student() {
         formData,
         {
           headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'multipart/form-data'
-          }
+            Authorization: `Token ${token}`,
+            "Content-Type": "multipart/form-data",
+          },
         }
       );
 
@@ -168,9 +174,10 @@ export default function Student() {
       setError(""); // Clear any existing errors
     } catch (err) {
       console.error("Error uploading file:", err);
-      const errorMessage = err.response?.data?.detail || 
-                          err.response?.data?.message || 
-                          "Failed to upload file";
+      const errorMessage =
+        err.response?.data?.detail ||
+        err.response?.data?.message ||
+        "Failed to upload file";
       setError(errorMessage);
     }
   };
@@ -181,7 +188,7 @@ export default function Student() {
       id: student.id,
       username: student.name,
       email: student.email,
-      role: "student"
+      role: "student",
     });
     setShowManageModal(true);
   };
@@ -190,18 +197,18 @@ export default function Student() {
   const handleUpdateStudent = async () => {
     try {
       const token = getAuthToken();
-      
+
       // Validate inputs
       if (!selectedStudent.username.trim()) {
         setError("Username cannot be empty");
         return;
       }
-      
+
       if (!selectedStudent.email.trim()) {
         setError("Email cannot be empty");
         return;
       }
-      
+
       // Email validation
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
       if (!emailRegex.test(selectedStudent.email)) {
@@ -213,7 +220,7 @@ export default function Student() {
         id: selectedStudent.id,
         username: selectedStudent.username,
         email: selectedStudent.email,
-        role: selectedStudent.role
+        role: selectedStudent.role,
       };
 
       const response = await axios.put(
@@ -221,9 +228,9 @@ export default function Student() {
         userData,
         {
           headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -243,20 +250,20 @@ export default function Student() {
 
   // Function to delete student
   const handleDeleteStudent = async (studentId) => {
-    if (!window.confirm('Are you sure you want to delete this student?')) {
+    if (!window.confirm("Are you sure you want to delete this student?")) {
       return;
     }
 
     try {
       const token = getAuthToken();
-      
+
       const response = await axios.delete(
         `${API}/api/users/users/${studentId}/`,
         {
           headers: {
-            'Authorization': `Token ${token}`,
-            'Content-Type': 'application/json'
-          }
+            Authorization: `Token ${token}`,
+            "Content-Type": "application/json",
+          },
         }
       );
 
@@ -273,8 +280,70 @@ export default function Student() {
     }
   };
 
+  // Function to create a group
+  // Update the handleCreateGroup function
+  const handleCreateGroup = async () => {
+    try {
+      const token = getAuthToken();
+      const userId = localStorage.getItem("userId"); // Get the current user ID
+
+      if (!token) {
+        setError("Authentication required");
+        return;
+      }
+
+      if (!newGroup.name.trim()) {
+        setError("Group name is required");
+        return;
+      }
+
+      if (newGroup.students.length === 0) {
+        setError("Please select at least one student");
+        return;
+      }
+
+      // Format the data according to the required structure
+      const groupData = {
+        name: newGroup.name.trim(),
+        teacher: userId, // Add the current user as teacher
+        students: newGroup.students,
+      };
+
+      // Debug logs
+      console.log("Token:", token);
+      console.log("Request Data:", groupData);
+
+      const response = await axios.post(`${API}/api/Quiz/groups/`, groupData, {
+        headers: {
+          Authorization: `Token ${token}`,
+          "Content-Type": "application/json",
+        },
+      });
+
+      console.log("Group created:", response.data);
+      setShowGroupModal(false);
+      setNewGroup({ name: "", students: [] });
+      setError("");
+    } catch (err) {
+      console.error("Error creating group:", err);
+      // Enhanced error logging
+      if (err.response) {
+        console.log("Error Response Data:", err.response.data);
+        console.log("Error Response Status:", err.response.status);
+        setError(
+          err.response.data.detail ||
+            err.response.data.message ||
+            JSON.stringify(err.response.data)
+        );
+      } else if (err.request) {
+        setError("No response received from server");
+      } else {
+        setError("Error setting up request");
+      }
+    }
+  };
   // Enhanced search function
-  const filteredStudents = students.filter(student => {
+  const filteredStudents = students.filter((student) => {
     const query = searchQuery.toLowerCase().trim();
     return (
       student.name.toLowerCase().includes(query) ||
@@ -299,27 +368,33 @@ export default function Student() {
         <section className="student-header">
           <div className="student-actions">
             <h1 className="student-title">
-              <button 
+              <button
                 className="add-student-btn"
                 onClick={() => setShowAddModal(true)}
               >
                 Add New Student <span className="student-add">＋</span>
               </button>
             </h1>
-            
+
             {/* Bulk upload input */}
             <input
               type="file"
               ref={fileInputRef}
               accept=".csv"
               onChange={handleFileUpload}
-              style={{ display: 'none' }}
+              style={{ display: "none" }}
             />
-            <button 
+            <button
               className="bulk-upload-btn"
               onClick={() => fileInputRef.current.click()}
             >
               Bulk Upload
+            </button>
+            <button
+              className="create-group-btn"
+              onClick={() => setShowGroupModal(true)}
+            >
+              Create Group
             </button>
           </div>
 
@@ -346,10 +421,12 @@ export default function Student() {
                   <input
                     type="text"
                     value={newStudent.username}
-                    onChange={(e) => setNewStudent({
-                      ...newStudent,
-                      username: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setNewStudent({
+                        ...newStudent,
+                        username: e.target.value,
+                      })
+                    }
                     required
                     className="input-control"
                     placeholder="student123"
@@ -363,10 +440,12 @@ export default function Student() {
                   <input
                     type="email"
                     value={newStudent.email}
-                    onChange={(e) => setNewStudent({
-                      ...newStudent,
-                      email: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setNewStudent({
+                        ...newStudent,
+                        email: e.target.value,
+                      })
+                    }
                     required
                     className="input-control"
                     placeholder="student@example.com"
@@ -377,13 +456,10 @@ export default function Student() {
               {error && <div className="error-message">{error}</div>}
 
               <div className="modal-buttons">
-                <button 
-                  onClick={handleAddStudent}
-                  className="login-button"
-                >
+                <button onClick={handleAddStudent} className="login-button">
                   Add Student
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setShowAddModal(false);
                     setError("");
@@ -409,10 +485,12 @@ export default function Student() {
                   <input
                     type="text"
                     value={selectedStudent.username}
-                    onChange={(e) => setSelectedStudent({
-                      ...selectedStudent,
-                      username: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setSelectedStudent({
+                        ...selectedStudent,
+                        username: e.target.value,
+                      })
+                    }
                     required
                     className="input-control"
                   />
@@ -425,10 +503,12 @@ export default function Student() {
                   <input
                     type="email"
                     value={selectedStudent.email}
-                    onChange={(e) => setSelectedStudent({
-                      ...selectedStudent,
-                      email: e.target.value
-                    })}
+                    onChange={(e) =>
+                      setSelectedStudent({
+                        ...selectedStudent,
+                        email: e.target.value,
+                      })
+                    }
                     required
                     className="input-control"
                   />
@@ -438,13 +518,10 @@ export default function Student() {
               {error && <div className="error-message">{error}</div>}
 
               <div className="modal-buttons">
-                <button 
-                  onClick={handleUpdateStudent}
-                  className="login-button"
-                >
+                <button onClick={handleUpdateStudent} className="login-button">
                   Update Student
                 </button>
-                <button 
+                <button
                   onClick={() => {
                     setShowManageModal(false);
                     setError("");
@@ -452,7 +529,7 @@ export default function Student() {
                       id: null,
                       username: "",
                       email: "",
-                      role: "student"
+                      role: "student",
                     });
                   }}
                   className="cancel-button"
@@ -466,7 +543,7 @@ export default function Student() {
 
         <div className="student-list">
           {filteredStudents.length > 0 ? (
-            filteredStudents.map(student => (
+            filteredStudents.map((student) => (
               <div key={student.id} className="student-row">
                 <div className="student-card">
                   <img
@@ -478,17 +555,19 @@ export default function Student() {
                   <span className="student-class">{student.class}</span>
                   <span className="student-id">{student.studentId}</span>
                   <div className="student-actions-buttons">
-                    <button 
+                    <button
                       className="student-manage"
-                      onClick={() => handleManageStudent({
-                        id: student.id,
-                        name: student.name,
-                        email: student.email
-                      })}
+                      onClick={() =>
+                        handleManageStudent({
+                          id: student.id,
+                          name: student.name,
+                          email: student.email,
+                        })
+                      }
                     >
                       Manage
                     </button>
-                    <button 
+                    <button
                       className="student-delete"
                       onClick={() => handleDeleteStudent(student.id)}
                     >
@@ -504,6 +583,79 @@ export default function Student() {
             </div>
           )}
         </div>
+
+        {/* Create Group Modal */}
+        {showGroupModal && (
+          <div className="modal">
+            <div className="modal-content">
+              <h2>Create New Group</h2>
+              <div className="form-group">
+                <label className="form-label">Group Name:</label>
+                <div className="input-field">
+                  <input
+                    type="text"
+                    value={newGroup.name}
+                    onChange={(e) =>
+                      setNewGroup({
+                        ...newGroup,
+                        name: e.target.value,
+                      })
+                    }
+                    required
+                    className="input-control"
+                    placeholder="Enter group name"
+                  />
+                </div>
+              </div>
+
+              <div className="form-group">
+                <label className="form-label">Select Students:</label>
+                <div className="students-select">
+                  {students.map((student) => (
+                    <label key={student.id} className="student-checkbox">
+                      <input
+                        type="checkbox"
+                        checked={newGroup.students.includes(student.id)}
+                        onChange={(e) => {
+                          if (e.target.checked) {
+                            setNewGroup({
+                              ...newGroup,
+                              students: [...newGroup.students, student.id],
+                            });
+                          } else {
+                            setNewGroup({
+                              ...newGroup,
+                              students: newGroup.students.filter(
+                                (id) => id !== student.id
+                              ),
+                            });
+                          }
+                        }}
+                      />
+                      {student.name}
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="modal-buttons">
+                <button onClick={handleCreateGroup} className="login-button">
+                  Create Group
+                </button>
+                <button 
+                  onClick={() => {
+                    setShowGroupModal(false);
+                    setError("");
+                    setNewGroup({ name: "", students: [] });
+                  }}
+                  className="cancel-button"
+                >
+                  Cancel
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </main>
       <Footer />
     </>
