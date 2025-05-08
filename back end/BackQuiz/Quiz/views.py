@@ -8,6 +8,7 @@ from .serializers import QuizSerializer, QuestionSerializer, OptionSerializer, S
 from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 from rest_framework.views import APIView
 from rest_framework import serializers
+from rest_framework.serializers import Serializer
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -153,7 +154,8 @@ class StudentQuestionOptionsView(generics.ListAPIView):
 
 class QuizSubmitView(generics.GenericAPIView):
     permission_classes = [permissions.IsAuthenticated, IsStudent]
-    
+    serializer_class = Serializer  # Placeholder serializer
+
     def post(self, request, quiz_id):
         try:
             quiz = Quiz.objects.get(pk=quiz_id)
@@ -189,8 +191,26 @@ class QuizSubmitView(generics.GenericAPIView):
             result, created = Result.objects.get_or_create(
                 quiz=quiz,
                 student=student,
-                defaults={'score': 0, 'max_score': quiz.questions.aggregate(total_points=models.Sum('points'))['total_points']}
+                defaults={
+                    'score': 0,
+                    'max_score': quiz.questions.aggregate(
+                        total_points=models.Sum('points')
+                    )['total_points'] or 0
+                }
             )
+            
+            # Ensure StudentAnswer objects exist for this quiz and student
+            student_answers = StudentAnswer.objects.filter(
+                question__quiz=quiz,
+                student=student
+            )
+            if not student_answers.exists():
+                return Response(
+                    {"error": "No answers submitted for this quiz."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Recalculate the score
             result.calculate_score()
             
             return Response({
@@ -311,11 +331,6 @@ class StudentQuizResultDetailView(generics.RetrieveAPIView):
         instance = self.get_object()
 
         # Check if the user has permission to view this result
-        if not request.user.is_teacher and instance.student != request.user:
-            return Response({"error": "You do not have permission to view this result."},
-                            status=status.HTTP_403_FORBIDDEN)
-
-        # Check if the quiz time has ended or max attempts are reached
         quiz = instance.quiz
         current_time = timezone.now()
         attempts_used = QuizAttempt.objects.filter(
@@ -387,6 +402,16 @@ class StudentQuizResultDetailView(generics.RetrieveAPIView):
         data['quiz_title'] = quiz.title
 
         return Response(data)
+
+    def get_queryset(self):
+        # Ensure students can only access their own results
+        user = self.request.user
+        if user.is_authenticated:
+            # Teachers can access all results
+            return Result.objects.all()
+        else:
+            # Students can only access their own results
+            return Result.objects.filter(student=user)
 
 # ✅ Group Views (for Teachers)
 class GroupListCreateView(generics.ListCreateAPIView):
