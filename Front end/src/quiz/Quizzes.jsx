@@ -242,7 +242,7 @@ const Quizzes = () => {
             throw new Error('Failed to create questions');
         }
 
-        navigate('/dashboard');
+        navigate('/programmed');
     } catch (err) {
         setError(err.message || 'Failed to create quiz or questions');
     } finally {

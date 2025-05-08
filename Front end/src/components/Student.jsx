@@ -63,8 +63,8 @@ export default function Student() {
           id: user.id,
           name: user.username,
           email: user.email,
-          class: user.class || 'Not Assigned', // Add default value if class is not present
-          studentId: user.student_id || `ST${user.id}` // Add default value if student_id is not present
+          class: user.class || 'Matricule : ', // Add default value if class is not present
+          studentId: user.student_id || `${user.id}` // Add default value if student_id is not present
         }));
 
       setStudents(studentUsers);

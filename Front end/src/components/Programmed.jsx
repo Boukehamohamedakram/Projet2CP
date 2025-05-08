@@ -222,7 +222,15 @@ export default function Programmed() {
             <div className="error">{error}</div>
           ) : filteredQuizzes.length === 0 ? (
             <div className="no-data">
-              {searchTerm ? "No matching quizzes found" : "No quizzes available"}
+              <div className="no-data-text">
+                {searchTerm ? "No matching quizzes found" : "No quizzes available"}
+              </div>
+              <button 
+                className="create-quiz-btn"
+                onClick={() => navigate('/quizzes')}
+              >
+                Create New Quiz
+              </button>
             </div>
           ) : (
             filteredQuizzes.map(q => (

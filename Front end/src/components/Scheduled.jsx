@@ -96,9 +96,11 @@ export default function Scheduled() {
         ) : (
           <div className="scheduled-list">
             {filteredQuizzes.length === 0 ? (
-              <div className="scheduled-empty">
-                <p>No scheduled quizzes found</p>
-                <button onClick={handleCreateNew}>Create Your First Quiz</button>
+              <div className="no-data">
+                <div className="no-data-text">
+                  {searchTerm ? "No matching quizzes found" : "No scheduled quizzes available"}
+                </div>
+                
               </div>
             ) : (
               filteredQuizzes.map(quiz => (
