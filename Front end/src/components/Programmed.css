@@ -268,3 +268,25 @@ select.card-category:focus {
     padding: 4px 8px;
   }
 }
+
+.no-quizzes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.create-quiz-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.create-quiz-button:hover {
+  background-color: #0056b3;
+}

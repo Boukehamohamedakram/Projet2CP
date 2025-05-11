@@ -46,6 +46,7 @@
 
 /* Create New Quiz Button */
 .create-quiz-btn {
+  margin: 0 auto 20px auto; /* Changed margins to auto for horizontal centering */
   background: linear-gradient(to right, #3498db, #2980b9);
   color: white;
   border: none;
@@ -53,9 +54,9 @@
   border-radius: 25px;
   font-size: 1rem;
   cursor: pointer;
-  margin: 1rem 0;
   transition: all 0.3s ease;
   box-shadow: 0 2px 4px rgba(52, 152, 219, 0.2);
+  display: block; /* Add display block */
 }
 
 .create-quiz-btn:hover {
@@ -69,13 +70,20 @@
   display: flex;
   flex-direction: column;
   gap: 16px;
+  flex: 1;
+}
+
+.scheduled-row {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
 }
 
 .scheduled-card {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr auto auto;
+  grid-template-columns: 40px minmax(200px, 2fr) minmax(150px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) 100px;
   align-items: center;
-  gap: 1.5rem;
+  gap: 1rem;
   padding: 1.25rem;
   background: white;
   border-radius: 0.75rem;
@@ -186,6 +194,52 @@
   opacity: 0.9;
 }
 
+.card-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.card-category {
+  background: #f5c518;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+}
+
+.card-date,
+.card-time {
+  background: #f0f0f0;
+  padding: 4px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+}
+
+.card-preview {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 6px 12px;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: opacity 0.2s;
+}
+
+.card-preview:hover {
+  opacity: 0.9;
+}
+
 /* States */
 .scheduled-loading,
 .scheduled-error,
@@ -200,21 +254,16 @@
   color: #e53e3e;
 }
 
-.scheduled-empty {
-  width: 100%;
-  text-align: center;
-  padding: 3rem;
-}
-
 .scheduled-empty p {
   color: #64748b;
   margin-bottom: 1rem;
+  font-size: 1.2rem;
 }
 
 /* Responsive Design */
 @media (max-width: 1200px) {
   .scheduled-card {
-    grid-template-columns: minmax(150px, 1.5fr) minmax(120px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr) 90px;
+    grid-template-columns: 40px minmax(150px, 1.5fr) minmax(120px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr) 90px;
     gap: 0.75rem;
     padding: 1rem;
   }
@@ -256,6 +305,14 @@
     width: 100%;
     margin-top: 8px;
   }
+
+  .card-icon {
+    margin-bottom: 8px;
+  }
+
+  .card-preview {
+    width: 100%;
+  }
 }
 
 @media (max-width: 480px) {
@@ -277,3 +334,11 @@
     padding: 4px 8px;
   }
 }
+
+.scheduled-empty {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+

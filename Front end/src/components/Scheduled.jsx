@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import NavBar from './NavBar';
 import Footer from './Footer';
 import './Scheduled.css';
+import fxIcon from '../assets/fx-icon.png';
 
 const API = import.meta.env.VITE_API_URL;
 
@@ -74,10 +75,6 @@ export default function Scheduled() {
       <NavBar />
       <main className="scheduled-main">
         <h1 className="scheduled-title">Scheduled Quizzes</h1>
-        
-        <button className="create-quiz-btn" onClick={handleCreateNew}>
-          Create New Quiz
-        </button>
 
         <div className="scheduled-search">
           <input
@@ -89,6 +86,13 @@ export default function Scheduled() {
           />
         </div>
 
+        <button 
+          className="create-quiz-btn"
+          onClick={handleCreateNew}
+        >
+          Create New Quiz
+        </button>
+
         {loading ? (
           <div className="scheduled-loading">Loading...</div>
         ) : error ? (
@@ -98,32 +102,35 @@ export default function Scheduled() {
             {filteredQuizzes.length === 0 ? (
               <div className="scheduled-empty">
                 <p>No scheduled quizzes found</p>
-                <button onClick={handleCreateNew}>Create Your First Quiz</button>
               </div>
             ) : (
               filteredQuizzes.map(quiz => (
-                <div key={quiz.id} className="scheduled-card">
-                  <div className="quiz-title">{quiz.title}</div>
-                  
-                  <span className="quiz-info">
-                    <span className="quiz-category">{quiz.category}</span>
-                  </span>
-                  
-                  <span className="quiz-info">
-                    <span>Starts: {new Date(quiz.start_time).toLocaleString()}</span>
-                  </span>
-                  
-                  <span className="quiz-info">
-                    <span>Duration: {quiz.time_limit} min</span>
-                    <span>Attempts: {quiz.max_attempts}</span>
-                  </span>
-
-                  <button 
-                    className="continue-editing-btn"
-                    onClick={() => handleContinueEditing(quiz.id)}
-                  >
-                    Continue Editing
-                  </button>
+                <div key={quiz.id} className="scheduled-row">
+                  <div className="scheduled-card">
+                    <img src={fxIcon} alt="" className="card-icon" />
+                    <div className="card-title">{quiz.title || "Untitled Quiz"}</div>
+                    <span className="card-category">{quiz.category || "No category"}</span>
+                    <span className="card-date">
+                      {quiz.start_time ? quiz.start_time.split('T')[0] : 'No date'}
+                    </span>
+                    <span className="card-time">
+                      {quiz.start_time ? 
+                        new Date(quiz.start_time).toLocaleTimeString('en-US', {
+                          hour: '2-digit',
+                          minute: '2-digit',
+                          hour12: true,
+                          timeZone: 'UTC'
+                        }) 
+                        : 'No time'
+                      }
+                    </span>
+                    <button 
+                      className="card-preview"
+                      onClick={() => navigate(`/quiz/${quiz.id}/quiz-details`)}
+                    >
+                      Preview
+                    </button>
+                  </div>
                 </div>
               ))
             )}

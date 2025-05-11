@@ -1,5 +1,9 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
+import {
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer,
+  PieChart, Pie, Cell
+} from 'recharts';
 import NavBar from "../../components/NavBar";
 import Footer from "../../components/Footer";
 import "../CSS/QuizStatistics.css";
@@ -7,72 +11,46 @@ import "../CSS/QuizStatistics.css";
 function QuizStatistics() {
   const navigate = useNavigate();
   const { id } = useParams();
-
+  
   const [quizData, setQuizData] = useState({
     title: '',
     topStudents: [],
     absentStudents: [],
     badQuestions: [],
-    gradeDistribution: [],
     average: 0,
-    completionRate: 0
+    completionRate: 0,
+    totalStudents: 0,
+    submittedCount: 0
   });
+  
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+
+  const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8'];
 
   useEffect(() => {
     const fetchQuizStatistics = async () => {
       try {
-        if (!id) {
-          throw new Error('Quiz ID not provided');
-        }
-
         const userData = JSON.parse(localStorage.getItem('userData'));
         if (!userData?.token) {
           navigate('/login');
           return;
         }
 
-        const analyticsResponse = await fetch(`http://localhost:8000/api/Quiz/quizzes/${id}/analytics/`, {
+        const response = await fetch(`${import.meta.env.VITE_API_URL}/api/Quiz/quizzes/${id}/analytics/`, {
           headers: {
-            'Authorization': `Token ${userData.token}`,
-            'Content-Type': 'application/json'
+            'Authorization': `Token ${userData.token}`
           }
         });
 
-        if (!analyticsResponse.ok) {
-          throw new Error(`Failed to fetch quiz analytics: ${analyticsResponse.status}`);
+        if (!response.ok) {
+          throw new Error('Failed to fetch quiz statistics');
         }
 
-        const analyticsData = await analyticsResponse.json();
-
-        const absentResponse = await fetch(`http://localhost:8000/api/Quiz/quizzes/${id}/absent-students/`, {
-          headers: {
-            'Authorization': `Token ${userData.token}`,
-            'Content-Type': 'application/json'
-          }
-        });
-
-        if (!absentResponse.ok) {
-          throw new Error(`Failed to fetch absent students: ${absentResponse.status}`);
-        }
-
-        const absentData = await absentResponse.json();
-
-        setQuizData({
-          title: analyticsData.title || 'Quiz Results',
-          topStudents: analyticsData.top_students || [],
-          absentStudents: absentData.absent_students || [],
-          badQuestions: analyticsData.hardest_question ? [analyticsData.hardest_question] : [],
-          gradeDistribution: analyticsData.grade_distribution || [],
-          average: analyticsData.average_score || 0,
-          completionRate: analyticsData.completion_rate || 0
-        });
-
-      } catch (err) {
-        console.error('Detailed error:', err);
-        setError(err.message);
-      } finally {
+        const data = await response.json();
+        setQuizData(data);
+        setLoading(false);
+      } catch (error) {
+        console.error('Error fetching quiz statistics:', error);
         setLoading(false);
       }
     };
@@ -80,70 +58,128 @@ function QuizStatistics() {
     fetchQuizStatistics();
   }, [id, navigate]);
 
-  if (loading) {
-    return (
-      <div className="quiz-statistics">
-        <NavBar />
-        <div className="loading">Loading quiz statistics...</div>
-        <Footer />
-      </div>
-    );
-  }
+  // Calculate score distribution for pie chart
+  const getScoreDistribution = () => {
+    if (!Array.isArray(quizData.topStudents)) return [];
+    
+    const ranges = [
+      { name: '0-20%', count: 0 },
+      { name: '21-40%', count: 0 },
+      { name: '41-60%', count: 0 },
+      { name: '61-80%', count: 0 },
+      { name: '81-100%', count: 0 }
+    ];
 
-  if (error) {
-    return (
-      <div className="quiz-statistics">
-        <NavBar />
-        <div className="error">
-          {error}
-          <button onClick={() => navigate('/dashboard')} className="back-button">
-            Back to Dashboard
-          </button>
-        </div>
-        <Footer />
-      </div>
-    );
+    quizData.topStudents.forEach(student => {
+      const score = (student.score / student.maxScore) * 100;
+      if (score <= 20) ranges[0].count++;
+      else if (score <= 40) ranges[1].count++;
+      else if (score <= 60) ranges[2].count++;
+      else if (score <= 80) ranges[3].count++;
+      else ranges[4].count++;
+    });
+
+    return ranges;
+  };
+
+  if (loading) {
+    return <div>Loading...</div>;
   }
 
   return (
     <>
       <NavBar />
       <div className="quiz-statistics">
-        <h1 className="title">{quizData.title}</h1>
-        <div className="statistics-section">
-          <div className="important-statistics">
-            <h2>Important Statistics</h2>
-            <p>Average: {quizData.average}</p>
-            <p>Completion Rate: {quizData.completionRate}%</p>
+        <h1 className="quiz-statistics-title">{quizData.title || 'Quiz Statistics'}</h1>
+        
+        <div className="statistics-grid">
+          {/* Important Statistics Card */}
+          <div className="statistics-card">
+            <h2>Overview</h2>
+            <div className="stat-row">
+              <span>Total Students:</span>
+              <span className="stat-value">{quizData.totalStudents || 0}</span>
+            </div>
+            <div className="stat-row">
+              <span>Submitted:</span>
+              <span className="stat-value">{quizData.submittedCount || 0}</span>
+            </div>
+            <div className="stat-row">
+              <span>Average Score:</span>
+              <span className="stat-value">
+                {typeof quizData.average === 'number' ? quizData.average.toFixed(2) : '0.00'}
+              </span>
+            </div>
+            <div className="stat-row">
+              <span>Completion Rate:</span>
+              <span className="stat-value">
+                {typeof quizData.completionRate === 'number' ? quizData.completionRate.toFixed(2) : 0}%
+              </span>
+            </div>
           </div>
-          <div className="top-students">
-            <h2>Top Students</h2>
-            <ul>
-              {quizData.topStudents.map(student => (
-                <li key={student.id}>{student.username} - {student.score}</li>
-              ))}
-            </ul>
+
+          {/* Score Distribution Chart */}
+          <div className="statistics-card">
+            <h2>Score Distribution</h2>
+            <div style={{ width: '100%', height: 300 }}>
+              <ResponsiveContainer>
+                <PieChart>
+                  <Pie
+                    data={getScoreDistribution()}
+                    dataKey="count"
+                    nameKey="name"
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    label
+                  >
+                    {getScoreDistribution().map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                  <Legend />
+                </PieChart>
+              </ResponsiveContainer>
+            </div>
           </div>
-          <div className="bad-questions">
-            <h2>Bad Performance Questions</h2>
-            {quizData.badQuestions.length > 0 ? (
-              quizData.badQuestions.map((question, index) => (
-                <div key={index}>
-                  <p>Question: {question.text}</p>
-                  <p>Wrong Attempts: {question.wrong_attempts}</p>
-                </div>
-              ))
-            ) : (
-              <p>No data available</p>
-            )}
+
+          {/* Bad Performance Questions Card */}
+          <div className="statistics-card">
+            <h2>Questions Needing Attention</h2>
+            {Array.isArray(quizData.badQuestions) && quizData.badQuestions.map((question, index) => (
+              <div key={index} className="question-row">
+                <span>Question {index + 1}:</span>
+                <span>{question?.text}</span>
+                <span className="failure-rate">
+                  {question?.wrong_attempts}% failure rate
+                </span>
+              </div>
+            ))}
           </div>
-          <div className="absent-students">
-            <h2>Absent Students</h2>
-            <ul>
-              {quizData.absentStudents.map(student => (
-                <li key={student.id}>{student.username} - {student.email}</li>
-              ))}
-            </ul>
+
+          {/* Top Performers Card */}
+          <div className="statistics-card">
+            <h2>Top Performers</h2>
+            {Array.isArray(quizData.topStudents) && quizData.topStudents.map((student, index) => (
+              <div key={index} className="student-row">
+                <span className="rank">#{index + 1}</span>
+                <span>{student?.username}</span>
+                <span className="group">Group: {student?.group || 'N/A'}</span>
+                <span className="score">{student?.score}/{student?.maxScore}</span>
+              </div>
+            ))}
+          </div>
+
+          {/* Absent Students Card */}
+          <div className="statistics-card">
+            <h2>Absent Students ({quizData.absentStudents?.length || 0})</h2>
+            {Array.isArray(quizData.absentStudents) && quizData.absentStudents.map((student, index) => (
+              <div key={index} className="student-row">
+                <span>{student?.username}</span>
+                <span>Group: {student?.group || 'N/A'}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>

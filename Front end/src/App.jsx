@@ -14,6 +14,7 @@ import History from './components/History';
 import Programmed from './components/Programmed';
 import Student from './components/Student';
 import Parameters from './components/Parameters'; 
+import QuizDetails from './components/QuizDetails';
 function App() {
   return (
     <BrowserRouter>
@@ -37,6 +38,7 @@ function App() {
         <Route path="/student" element={<Student />} />
         <Route path="/parameters"     element={<Parameters />} /> 
         <Route path="/quizzes" element={<Quizzes />} />
+        <Route path="/quiz/:id/quiz-details" element={<QuizDetails />} />
         <Route path="/update-user-info" element={<UpdateUserInfo />} />
       </Routes>
     </BrowserRouter>
