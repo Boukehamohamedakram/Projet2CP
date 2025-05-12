@@ -1,0 +1,13 @@
+[Unit]
+Description=Backend Django Service
+After=network.target
+
+[Service]
+User=pi
+Group=pi
+WorkingDirectory=/home/pi/Projet2CP/back\ end/BackQuiz
+ExecStart=/home/pi/Projet2CP/back\ end/venv/bin/python /home/pi/Projet2CP/back\ end/BackQuiz/manage.py runserver 0.0.0.0:8000
+Restart=always
+
+[Install]
+WantedBy=multi-user.target
