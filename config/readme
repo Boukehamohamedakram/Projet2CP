@@ -1,0 +1,20 @@
+Wi-Fi Access Point Configuration
+This folder contains configuration files needed to set up the Raspberry Pi as a Wi-Fi access point for students and teachers to connect to. These files are part of the automatic setup process and are designed to simplify the configuration.
+
+Files
+1) hostapd.conf
+This file contains the configuration for hostapd, which sets up the Raspberry Pi as an access point.
+
+SSID: The Wi-Fi network name.
+
+Password: The password for the Wi-Fi network.
+
+Channel: The Wi-Fi channel used for the access point.
+
+2)dnsmasq.conf
+This file configures dnsmasq for DHCP, allowing devices that connect to the Wi-Fi access point to receive IP addresses automatically.
+
+It defines the range of IPs that can be assigned to devices.
+
+3)dhcpcd.conf
+This file configures the DHCP client daemon to provide network settings, including static IP configuration for the Raspberry Pi's Wi-Fi interface.
