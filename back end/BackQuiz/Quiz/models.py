@@ -94,42 +94,27 @@ class StudentAnswer(models.Model):
     class Meta:
         unique_together = ('student', 'question')
 
+    def __str__(self):
+        return f"Answer by {self.student.username} for {self.question.text}"
+
 class Result(models.Model):
     quiz = models.ForeignKey(Quiz, on_delete=models.CASCADE)
     student = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
     max_score = models.DecimalField(max_digits=5, decimal_places=2, default=0)
-    completed_at = models.DateTimeField(auto_now=True)
-    is_absent = models.BooleanField(default=False)  # Field to track absentees
+    completed_at = models.DateTimeField(auto_now_add=True)
+    is_absent = models.BooleanField(default=False)
 
-    class Meta:
-        unique_together = ('quiz', 'student')
-        
+    def __str__(self):
+        return f"{self.student.username} - {self.quiz.title} - {self.score}/{self.max_score}"
+
     def calculate_score(self):
-        """Calculate the score based on correct answers and question points"""
-        student_answers = StudentAnswer.objects.filter(
+        """Calculates and updates the score based on the selected options."""
+        correct_answers = StudentAnswer.objects.filter(
+            student=self.student,
             question__quiz=self.quiz,
-            student=self.student
+            selected_option__is_correct=True
         )
-        
-        total_points = 0
-        earned_points = 0
-        
-        # Calculate total possible points for the quiz
-        for question in self.quiz.questions.all():
-            total_points += question.points
-        
-        # Calculate earned points from correct answers
-        for answer in student_answers:
-            if answer.question.question_type in ['mcq', 'tf']:
-                if answer.selected_option and answer.selected_option.is_correct:
-                    earned_points += answer.question.points
-            # For open-ended questions, use the manually assigned score
-            elif answer.question.question_type == 'open':
-                earned_points += answer.earned_points
-        
-        self.score = earned_points
-        self.max_score = total_points
+        total_score = sum(answer.question.points for answer in correct_answers)
+        self.score = total_score
         self.save()
-        
-        return self.score, self.max_score

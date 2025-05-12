@@ -6,6 +6,7 @@ class Question {
   final int quizId;
   final String text;
   final String questionType; // 'mcq', 'tf', 'text'
+  final int point;
   final List<Option>? options;
 
   Question({
@@ -13,6 +14,7 @@ class Question {
     required this.quizId,
     required this.text,
     required this.questionType,
+    required this.point,
     this.options,
   });
 
@@ -28,6 +30,7 @@ class Question {
       quizId: json['quiz'],
       text: json['text'],
       questionType: json['question_type'],
+      point: json['point'] ?? 0,
       options: optionsList,
     );
   }
@@ -37,6 +40,7 @@ class Question {
         'quiz': quizId,
         'text': text,
         'question_type': questionType,
+        'point': point,
       };
 }
 

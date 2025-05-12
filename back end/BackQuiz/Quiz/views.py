@@ -9,6 +9,7 @@ from .permissions import IsTeacher, IsStudent, IsTeacherOrReadOnly
 from rest_framework.views import APIView
 from rest_framework import serializers
 from rest_framework.serializers import Serializer
+from django.db.models import Avg, Count, F, Q
 
 # ✅ Quiz Views
 class QuizListCreateView(generics.ListCreateAPIView):
@@ -160,20 +161,20 @@ class QuizSubmitView(generics.GenericAPIView):
         try:
             quiz = Quiz.objects.get(pk=quiz_id)
             student = request.user
-            
+
             # Check if student can submit this quiz
             attempts_count = QuizAttempt.objects.filter(
                 quiz=quiz,
                 student=student,
                 is_completed=True
             ).count()
-            
+
             if attempts_count >= quiz.max_attempts:
                 return Response(
                     {"error": "You have used all your allowed attempts for this quiz."},
                     status=status.HTTP_403_FORBIDDEN
                 )
-            
+
             # Get or create the current attempt
             current_attempt, created = QuizAttempt.objects.get_or_create(
                 quiz=quiz,
@@ -181,12 +182,12 @@ class QuizSubmitView(generics.GenericAPIView):
                 is_completed=False,
                 defaults={'attempt_number': attempts_count + 1}
             )
-            
+
             # Mark current attempt as completed
             current_attempt.is_completed = True
             current_attempt.completed_at = timezone.now()
             current_attempt.save()
-            
+
             # Calculate score for this attempt
             result, created = Result.objects.get_or_create(
                 quiz=quiz,
@@ -198,7 +199,7 @@ class QuizSubmitView(generics.GenericAPIView):
                     )['total_points'] or 0
                 }
             )
-            
+
             # Ensure StudentAnswer objects exist for this quiz and student
             student_answers = StudentAnswer.objects.filter(
                 question__quiz=quiz,
@@ -209,10 +210,10 @@ class QuizSubmitView(generics.GenericAPIView):
                     {"error": "No answers submitted for this quiz."},
                     status=status.HTTP_400_BAD_REQUEST
                 )
-            
+
             # Recalculate the score
             result.calculate_score()
-            
+
             return Response({
                 "message": "Quiz submitted successfully.",
                 "attempt_number": current_attempt.attempt_number,
@@ -221,7 +222,7 @@ class QuizSubmitView(generics.GenericAPIView):
                 "max_score": result.max_score,
                 "percentage": round((result.score / result.max_score * 100) if result.max_score > 0 else 0, 2)
             })
-            
+
         except Quiz.DoesNotExist:
             return Response(
                 {"error": "Quiz not found."},
@@ -262,31 +263,32 @@ class StudentAnswerListCreateView(generics.ListCreateAPIView):
     def create(self, request, *args, **kwargs):
         # Get question and check if its quiz is still active
         question_id = request.data.get('question')
+        selected_option_id = request.data.get('selected_option')  # Get selected option ID
         try:
             question = Question.objects.get(pk=question_id)
             quiz = question.quiz
             student = request.user
-            
+
             # Check if quiz is active for submission
             if not quiz.is_active:
                 return Response(
                     {"error": "This quiz is no longer active. You cannot submit answers."},
                     status=status.HTTP_403_FORBIDDEN
                 )
-                
+
             # Check if student has attempts remaining
             attempts_count = QuizAttempt.objects.filter(
                 quiz=quiz,
                 student=student,
                 is_completed=True
             ).count()
-            
+
             if attempts_count >= quiz.max_attempts:
                 return Response(
                     {"error": "You have used all your allowed attempts for this quiz."},
                     status=status.HTTP_403_FORBIDDEN
                 )
-            
+
             # Get or create the current attempt
             current_attempt, created = QuizAttempt.objects.get_or_create(
                 quiz=quiz,
@@ -294,16 +296,28 @@ class StudentAnswerListCreateView(generics.ListCreateAPIView):
                 is_completed=False,
                 defaults={'attempt_number': attempts_count + 1}
             )
-                
-            # Continue with normal creation process
-            return super().create(request, *args, **kwargs)
-            
+
+            # Check if the selected option exists
+            try:
+                selected_option = Option.objects.get(pk=selected_option_id, question=question)
+            except Option.DoesNotExist:
+                return Response(
+                    {"error": "Selected option does not exist for this question."},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+
+            # Create the StudentAnswer object
+            serializer = self.get_serializer(data=request.data)
+            serializer.is_valid(raise_exception=True)
+            serializer.save(student=student, question=question, selected_option=selected_option)  # Save student, question, and selected_option
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+
         except Question.DoesNotExist:
             return Response(
                 {"error": "Question not found."},
                 status=status.HTTP_404_NOT_FOUND
             )
-        
         
 
 class StudentAnswerDetailView(generics.RetrieveAPIView):
@@ -506,3 +520,66 @@ class QuizQuestionsCreateView(generics.CreateAPIView):
         return Response({"quiz": quiz_id, "questions": created_questions}, status=status.HTTP_201_CREATED)
 
 
+
+
+class QuizAnalyticsView(APIView):
+    permission_classes = [permissions.IsAuthenticated, IsTeacher]
+
+    def get(self, request, quiz_id):
+        try:
+            quiz = Quiz.objects.get(pk=quiz_id)
+
+            # Total students assigned to the quiz
+            total_students = quiz.assigned_students.count()
+
+            # Students who submitted the quiz
+            submitted_students = Result.objects.filter(quiz=quiz).count()
+
+            # Completion rate
+            completion_rate = (submitted_students / total_students * 100) if total_students > 0 else 0
+
+            # Average score
+            average_score = Result.objects.filter(quiz=quiz).aggregate(Avg('score'))['score__avg'] or 0
+
+            # Top students
+            top_students = Result.objects.filter(quiz=quiz).order_by('-score')[:5]
+            top_students_data = [
+                {
+                    "id": result.student.id,
+                    "username": result.student.username,
+                    "score": result.score
+                }
+                for result in top_students
+            ]
+
+            # Hardest question (most students got wrong)
+            hardest_question = (
+                StudentAnswer.objects.filter(question__quiz=quiz)
+                .values('question')
+                .annotate(
+                    total_attempts=Count('id'),
+                    wrong_attempts=Count('id', filter=Q(selected_option__is_correct=False))
+                )
+                .order_by('-wrong_attempts')
+                .first()
+            )
+            hardest_question_data = None
+            if hardest_question:
+                question = Question.objects.get(pk=hardest_question['question'])
+                hardest_question_data = {
+                    "id": question.id,
+                    "text": question.text,
+                    "wrong_attempts": hardest_question['wrong_attempts'],
+                    "total_attempts": hardest_question['total_attempts']
+                }
+
+            # Return analytics data
+            return Response({
+                "completion_rate": round(completion_rate, 2),
+                "average_score": round(average_score, 2),
+                "top_students": top_students_data,
+                "hardest_question": hardest_question_data
+            }, status=200)
+
+        except Quiz.DoesNotExist:
+            return Response({"error": "Quiz not found."}, status=404)

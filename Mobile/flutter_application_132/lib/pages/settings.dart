@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import '../settings/page1.dart'; // Import your settings page
+import '../screens/login_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -13,10 +15,11 @@ class SettingsScreen extends StatelessWidget {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          const ListTile(
-            leading: Icon(Icons.person),
-            title: Text('Account'),
-            subtitle: Text('Manage your account info'),
+          ListTile(
+            leading: const Icon(Icons.person),
+            title: const Text('Account'),
+            subtitle: const Text('Manage your account info'),
+            onTap: () {},
           ),
           const Divider(),
           const ListTile(
@@ -35,7 +38,10 @@ class SettingsScreen extends StatelessWidget {
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Logout'),
             onTap: () {
-              // Add logout logic
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const LoginPage()),
+              ); // Add logout logic
             },
           ),
         ],

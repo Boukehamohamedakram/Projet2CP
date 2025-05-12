@@ -49,7 +49,7 @@ class QuizSerializer(serializers.ModelSerializer):
         queryset=Group.objects.all(),
         required=False
     )
-
+    
     class Meta:
         model = Quiz
         fields = [
@@ -99,12 +99,54 @@ class QuizSerializer(serializers.ModelSerializer):
 class StudentAnswerSerializer(serializers.ModelSerializer):
     class Meta:
         model = StudentAnswer
-        fields = ['id', 'student', 'question', 'selected_option', 'text_answer']
+        fields = ['id', 'question', 'selected_option', 'text_answer']  # Remove 'student'
 
 class ResultSerializer(serializers.ModelSerializer):
+    quiz_title = serializers.CharField(source='quiz.title', read_only=True)
+    questions = serializers.SerializerMethodField()
+    quiz_end_time = serializers.DateTimeField(source='quiz.end_time', read_only=True)  # <-- Add this line
+
     class Meta:
         model = Result
-        fields = ['id', 'quiz', 'student', 'score', 'completed_at']
+        fields = [
+            'id', 'quiz', 'quiz_title', 'student', 'score', 'max_score','completed_at', 'quiz_end_time', 'questions' ]
+
+    def get_questions(self, obj):
+        questions = obj.quiz.questions.all()
+        answers = {a.question_id: a for a in StudentAnswer.objects.filter(student=obj.student, question__quiz=obj.quiz)}
+        result = []
+        for q in questions:
+            options = q.options.all()
+            option_list = [
+                {"id": o.id, "text": o.text, "is_correct": o.is_correct}
+                for o in options
+            ]
+            answer = answers.get(q.id)
+            if answer:
+                selected_option_id = answer.selected_option.id if answer.selected_option else None
+                selected_option_text = answer.selected_option.text if answer.selected_option else None
+                is_correct = answer.selected_option.is_correct if answer.selected_option else None
+                points_earned = float(answer.earned_points)
+                status = None
+            else:
+                selected_option_id = None
+                selected_option_text = None
+                is_correct = None
+                points_earned = 0
+                status = "Not answered"
+            result.append({
+                "question_id": q.id,
+                "question_text": q.text,
+                "question_type": q.question_type,
+                "points": q.points,
+                "options": option_list,
+                "selected_option_id": selected_option_id,
+                "selected_option_text": selected_option_text,
+                "is_correct": is_correct,
+                "points_earned": points_earned,
+                "status": status,
+            })
+        return result
 
 
 class StudentQuizHistorySerializer(serializers.ModelSerializer):
@@ -165,3 +207,15 @@ class QuizResultDetailSerializer(serializers.ModelSerializer):
             if obj.max_score > 0:
                 return round((obj.score / obj.max_score) * 100, 2)
             return 0
+
+class ResultQuestionOptionSerializer(serializers.Serializer):
+    question_id = serializers.IntegerField()
+    question_text = serializers.CharField()
+    question_type = serializers.CharField()
+    points = serializers.IntegerField()
+    options = serializers.ListField()
+    selected_option_id = serializers.IntegerField(allow_null=True)
+    selected_option_text = serializers.CharField(allow_null=True)
+    is_correct = serializers.BooleanField(allow_null=True)
+    points_earned = serializers.FloatField()
+    status = serializers.CharField(allow_null=True, required=False)

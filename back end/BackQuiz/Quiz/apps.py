@@ -6,4 +6,4 @@ class QuizConfig(AppConfig):
     name = 'Quiz'
 
     def ready(self):
-        import Quiz.signals  # Import the signals to connect them
+        import Quiz.signals
