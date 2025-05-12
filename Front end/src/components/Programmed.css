@@ -3,7 +3,7 @@
   max-width: 1400px;
   margin: 24px auto;
   padding: 2rem;
-  background-color: #f5f7fa;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -26,6 +26,12 @@
   margin: 0 auto 2rem auto;
   display: flex;
   justify-content: center;
+    border: #31bce2 1px solid;
+  padding: 0 12px;    
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
 }
 
 .ps-icon {
@@ -36,7 +42,7 @@
 .ps-filter {
   background: none;
   border: none;
-  color: #1a75d1;
+  color: #31bce2;
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -61,7 +67,7 @@
 
 .ps-input:focus {
   outline: none;
-  border-color: #0e87c1;
+  border-color: #31bce2;
   box-shadow: 0 0 0 2px rgba(14, 135, 193, 0.1);
 }
 
@@ -87,11 +93,17 @@
   gap: 1rem;
   padding: 1.25rem;
   background: white;
-  border-radius: 0.75rem;
+  border: 1.3px solid #31bce2;
+  border-color: #31bce2;
+  border-radius: 1.5rem;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
-  width: 100%;
+  width: 90%; /* Reduce the width to make the cards smaller */
   transition: all 0.2s ease;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
 }
 
 .programmed-card:hover {
@@ -116,6 +128,7 @@
   padding: 4px 8px;
   border-radius: 12px;
   font-size: 0.9rem;
+  margin: 0 auto;
 }
 
 select.card-category {
@@ -124,6 +137,8 @@ select.card-category {
   cursor: pointer;
   padding: 4px 24px 4px 8px;
   appearance: none;
+    margin: 0 auto;
+
 }
 
 select.card-category:focus {
@@ -134,7 +149,8 @@ select.card-category:focus {
 
 .card-date,
 .card-time {
-  background: #f0f0f0;
+  background: #4e4d4d;
+  color: white;
   padding: 4px 8px;
   border-radius: 12px;
   white-space: nowrap;
@@ -142,6 +158,9 @@ select.card-category:focus {
   align-items: center;
   gap: 4px;
   font-size: 0.9rem;
+    margin: 0 auto;
+  text-align: center; 
+  
 }
 
 /* Delete the combined datetime holder */
@@ -149,31 +168,40 @@ select.card-category:focus {
   display: none;
 }
 
-/* Delete & Modify buttons */
-.card-delete {
-  background: #e74c3c;
-  color: #fff;
+/* Modify Button */
+.card-modify {
+  background-color: #3ca0c8; /* Light blue */
+  color: white;
   border: none;
-  padding: 6px 12px;
-  border-radius: 12px;
-  cursor: pointer;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
   font-size: 0.9rem;
-}
-.card-delete:hover {
-  opacity: 0.9;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
 }
 
-.card-modify {
-  background: #3498db;
-  color: #fff;
-  border: none;
-  padding: 6px 12px;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 0.9rem;
-}
 .card-modify:hover {
-  opacity: 0.9;
+  background-color: #0474bc; /* Darker blue */
+  transform: scale(1.05);
+}
+
+/* Delete Button */
+.card-delete {
+  background-color: #e74c3c; /* Red */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-delete:hover {
+  background-color: #c0392b; /* Darker red */
+  transform: scale(1.05);
 }
 
 /* Update media queries for better responsiveness */
@@ -267,4 +295,26 @@ select.card-category:focus {
     font-size: 0.75rem;
     padding: 4px 8px;
   }
+}
+
+.no-quizzes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.create-quiz-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.create-quiz-button:hover {
+  background-color: #0056b3;
 }

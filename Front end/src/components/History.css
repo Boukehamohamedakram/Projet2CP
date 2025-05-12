@@ -4,7 +4,7 @@
   max-width: 1400px;
   margin: 24px auto;
   padding: 2rem;
-  background-color: #f5f7fa;
+  background-color: #ffffff;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -27,6 +27,8 @@
   margin: 0 auto 2rem auto;
   display: flex;
   justify-content: center;
+  border:#31bce2 1px solid;
+  border-color: #31bce2;
 }
 
 .hs-icon {
@@ -37,7 +39,7 @@
 .hs-filter {
   background: none;
   border: none;
-  color: #1a75d1;
+  color: #31bce2;
   font-weight: bold;
   display: flex;
   align-items: center;
@@ -86,11 +88,10 @@
 
 .history-search-input:focus {
   outline: none;
-  border-color: #0e87c1;
+  border-color: #31bce2;
   box-shadow: 0 0 0 2px rgba(14, 135, 193, 0.1);
 }
 
-/* List of cards */
 .history-list {
   width: 100%;
   display: flex;
@@ -104,7 +105,6 @@
   width: 100%;
 }
 
-/* Update the grid layout to match Programmed */
 .history-card {
   display: grid;
   grid-template-columns: minmax(200px, 2fr) minmax(150px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) 100px;
@@ -116,7 +116,9 @@
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   margin-bottom: 1rem;
   width: 100%;
-  box-sizing: border-box; /* Add this to include padding in width calculation */
+  border: 1.3px solid #31bce2;
+  border-color: #31bce2;
+  box-sizing: border-box;
   margin-left: auto;
   margin-right: auto;
   transition: all 0.2s ease;
@@ -141,28 +143,33 @@
   color: #333;
   padding: 4px 8px;
   border-radius: 12px;
+  justify-content: center;
   font-size: 0.9rem;
+  margin: 0 auto; 
 }
 
 /* Match date and time style */
 .history-card-date,
 .history-card-time {
-  background: #f0f0f0;
+  background: #000000;
+    color: #fff;
   padding: 4px 8px;
   border-radius: 12px;
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   font-size: 0.9rem;
+  margin: 0 auto; 
 }
 
 /* Match button style */
 .history-view-results {
-  background: #3498db;
+  background: #31bce2;
   color: #fff;
   border: none;
-  padding: 6px 12px;
+  padding: 8px 8px;
   border-radius: 12px;
   cursor: pointer;
   font-size: 0.9rem;
@@ -204,6 +211,10 @@
   .history-filter-search {
     flex-direction: column;
     align-items: center;
+      border: #31bce2 1px solid;
+    border-radius: 25px;
+    padding: 8px 16px;
+
   }
 
   .history-card {
@@ -212,11 +223,13 @@
     align-items: flex-start;
     gap: 12px;
     padding: 16px;
+
   }
 
   .history-card-title {
     width: 100%;
     margin-bottom: 8px;
+    
   }
 
   .history-card-category,

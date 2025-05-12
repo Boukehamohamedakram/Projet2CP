@@ -1,6 +1,6 @@
 .general-statistics {
   padding: 2rem;
-  background-color: #f5f7fa;
+  background-color: #ffffff;
   min-height: 100vh;
 }
 
@@ -17,6 +17,7 @@
   gap: 2rem;
   max-width: 1200px;
   margin: 0 auto;
+  
 }
 
 .card {
@@ -96,12 +97,12 @@
 
 .item-date,
 .item-time {
-  background: #f0f0f0;
+  background: #dfc200;
   padding: 4px 8px;
   border-radius: 12px;
   white-space: nowrap;
   font-size: 0.9rem;
-  color: #666;
+  color: #ffffff;
   text-align: center;      /* Center text inside each element */
   min-width: 100px;        /* Give consistent width */
 }

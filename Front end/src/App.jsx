@@ -14,6 +14,7 @@ import History from './components/History';
 import Programmed from './components/Programmed';
 import Student from './components/Student';
 import Parameters from './components/Parameters'; 
+import QuizDetails from './components/QuizDetails';
 function App() {
   return (
     <BrowserRouter>
@@ -26,7 +27,7 @@ function App() {
         <Route path="/create/:id" element={<Quizzes />} />
         <Route path="/create" element={<Quizzes />} />
         <Route path="/dashboard" element={<GeneralStatistics />} />
-        <Route path="/quiz-statistics" element={<QuizStatistics />} />
+        <Route path="/quiz-statistics/:id" element={<QuizStatistics />} />
         <Route path="/navbar" element={<NavBar />} />
         <Route path="/footer" element={<Footer />} />
         <Route path="/scheduled" element={<Scheduled />} />
@@ -37,6 +38,7 @@ function App() {
         <Route path="/student" element={<Student />} />
         <Route path="/parameters"     element={<Parameters />} /> 
         <Route path="/quizzes" element={<Quizzes />} />
+        <Route path="/quiz/:id/quiz-details" element={<QuizDetails />} />
         <Route path="/update-user-info" element={<UpdateUserInfo />} />
       </Routes>
     </BrowserRouter>

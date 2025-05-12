@@ -1,4 +1,14 @@
+/* Ensure the page takes up the full height of the viewport */
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main container */
 .home-main {
+  flex: 1; /* Allow the main content to grow and take up available space */
   max-width: 90%;
   margin: 24px auto;
   display: flex;
@@ -42,6 +52,7 @@
   flex: 1 1 300px;
   max-width: 400px;
   width: 100%;
+  margin-right: auto; /* Push the illustration to the left */
 }
 
 /* Action cards */
@@ -54,24 +65,34 @@
 }
 .home-card {
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex-direction: column; /* Stack content vertically */
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
   width: 120px;
   height: 120px;
-  background: #a3d9ff;
+  background: #31bce2;
   border-radius: 12px;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   text-decoration: none;
   color: #fff;
   padding: 12px;
   text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Add smooth transition */
 }
+
+.home-card:hover {
+  transform: translateY(-5px); /* Slight lift on hover */
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Stronger shadow on hover */
+  background: #2aa3c4; /* Slightly darker blue on hover */
+}
+
 .home-card img {
   width: 50px;
   height: 50px;
+  margin-bottom: 8px; /* Add spacing below the image */
 }
+
 .home-card span {
-  margin-top: 8px;
   font-weight: bold;
   font-size: 0.9rem;
 }
@@ -102,4 +123,13 @@
     width: 40px;
     height: 40px;
   }
+}
+
+/* Footer */
+footer {
+  background-color: #f1f5f9;
+  text-align: center;
+  padding: 1rem;
+  width: 100%;
+  margin-top: auto; /* Push the footer to the bottom */
 }

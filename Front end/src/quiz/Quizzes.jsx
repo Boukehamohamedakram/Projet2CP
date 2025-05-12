@@ -16,7 +16,7 @@ const QUIZ_CATEGORIES = [
 const QUESTION_TYPES = [
   { value: 'mcq', label: 'Multiple Choice' },
   { value: 'tf', label: 'True/False' },
-  { value: 'text', label: 'Short Answer' }
+  { value: 'text', label: 'Screen-displayed Question' } // Changed from 'open' to 'text'
 ];
 
 const Quizzes = () => {
@@ -110,13 +110,32 @@ const Quizzes = () => {
     }));
   };
 
+  const getDefaultOptions = (type) => {
+    switch (type) {
+      case 'tf':
+        return ['True', 'False'];
+      default:
+        return ['', ''];
+    }
+  };
+
   // Handle question changes
   const handleQuestionChange = (e) => {
     const { name, value } = e.target;
-    setCurrentQuestion((prev) => ({
-      ...prev,
-      [name]: name === "marks" ? parseInt(value, 10) : value // Parse marks as an integer
-    }));
+    setCurrentQuestion(prev => {
+      if (name === 'type') {
+        return {
+          ...prev,
+          [name]: value,
+          options: getDefaultOptions(value),
+          correctAnswers: value === 'tf' ? [0] : [] // Default True as correct for T/F
+        };
+      }
+      return {
+        ...prev,
+        [name]: name === "marks" ? parseInt(value, 10) : value
+      };
+    });
   };
 
   const handleOptionChange = (index, value) => {
@@ -217,7 +236,7 @@ const Quizzes = () => {
         // Step 2: Create questions and options for the quiz
         const questionsPayload = {
             questions: questions.map((question) => ({
-                text: question.text,
+                text: question.type === 'text' ? 'Screen Question' : question.text, // Changed from 'open' to 'text'
                 question_type: question.type,
                 points: question.marks,
                 options: question.options.map((option, index) => ({
@@ -242,7 +261,7 @@ const Quizzes = () => {
             throw new Error('Failed to create questions');
         }
 
-        navigate('/dashboard');
+        navigate('/programmed');
     } catch (err) {
         setError(err.message || 'Failed to create quiz or questions');
     } finally {
@@ -384,6 +403,7 @@ const Quizzes = () => {
           </div>
 
           {/* Add question fields */}
+          <hr className="section-divider" />
           <h2>Add Questions</h2>
           <div className="form-group">
             <label htmlFor="question_text">Question Text</label>
@@ -429,44 +449,98 @@ const Quizzes = () => {
 
           <div className="form-group">
             <label>Options</label>
-            {currentQuestion.options.map((option, index) => (
-              <div key={index} className="option-group">
-                <input
-                  type="text"
-                  value={option}
-                  onChange={(e) => handleOptionChange(index, e.target.value)}
-                  placeholder={`Option ${index + 1}`}
-                  required
-                />
-                <input
-                  type="checkbox"
-                  checked={currentQuestion.correctAnswers.includes(index)}
-                  onChange={() => handleCorrectAnswerToggle(index)}
-                />
-                <button type="button" onClick={() => handleRemoveOption(index)}>
-                  Remove
-                </button>
+            {currentQuestion.type === 'tf' ? (
+              <div className="tf-options">
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index} className="tf-option">
+                    <span>{option}</span>
+                    <input
+                      type="radio"
+                      name="tfCorrect"
+                      checked={currentQuestion.correctAnswers.includes(index)}
+                      onChange={() => {
+                        setCurrentQuestion((prev) => ({
+                          ...prev,
+                          correctAnswers: [index]
+                        }));
+                      }}
+                    />
+                  </div>
+                ))}
               </div>
-            ))}
-            <button type="button" onClick={handleAddOption}>
-              Add Option
-            </button>
+            ) : currentQuestion.type === 'text' ? (
+              <div className="screen-options">
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index} className="option-group">
+                    <input
+                      type="text"
+                      value={option}
+                      onChange={(e) => handleOptionChange(index, e.target.value)}
+                      placeholder={`Question ${index + 1}`}
+                    />
+                    <input
+                      type="checkbox"
+                      checked={currentQuestion.correctAnswers.includes(index)}
+                      onChange={() => handleCorrectAnswerToggle(index)}
+                    />
+                    <button type="button" onClick={() => handleRemoveOption(index)}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <div className="button-group">
+                  <button type="button" onClick={handleAddOption} className="add-option-btn">
+                    Add Option
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="form-group">
+                <label>Options</label>
+                {currentQuestion.options.map((option, index) => (
+                  <div key={index} className="option-group">
+                    <input
+                      type="text"
+                      value={option}
+                      onChange={(e) => handleOptionChange(index, e.target.value)}
+                      placeholder={`Option ${index + 1}`}
+                      required
+                    />
+                    <input
+                      type="checkbox"
+                      checked={currentQuestion.correctAnswers.includes(index)}
+                      onChange={() => handleCorrectAnswerToggle(index)}
+                    />
+                    <button type="button" onClick={() => handleRemoveOption(index)}>
+                      Remove
+                    </button>
+                  </div>
+                ))}
+                <div className="button-group">
+                  <button type="button" onClick={handleAddOption} className="add-option-btn">
+                    Add Option
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {/* Save Question Button */}
+            <div className="button-group">
+              <button type="button" onClick={handleAddQuestion} className="save-question-button">
+                Save Question
+              </button>
+            </div>
           </div>
 
-          {/* Save Question Button */}
-          <button type="button" onClick={handleAddQuestion} className="save-question-button">
-            Save Question
-          </button>
-
           {/* Display Saved Questions */}
-          <h3>Saved Questions</h3>
-          <ul>
+          <h3 className="saved-questions-title">Saved Questions</h3>
+          <ul className="saved-questions">
             {questions.map((question, index) => (
               <li key={index}>
                 <strong>{question.text}</strong> ({question.type}) - {question.marks} points
                 <ul>
                   {question.options.map((option, i) => (
-                    <li key={i}>
+                    <li key={i} className={question.correctAnswers.includes(i) ? 'correct' : ''}>
                       {option} {question.correctAnswers.includes(i) ? "(Correct)" : ""}
                     </li>
                   ))}

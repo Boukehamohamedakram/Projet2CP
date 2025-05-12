@@ -1,10 +1,20 @@
+/* Ensure the page takes up the full height */
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Main container */
 .parameters-main {
-  max-width: 90%;
-  margin: 24px auto;
+  flex: 1; /* Allow the main content to grow and take up available space */
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 16px;
+  max-width: 90%;
+  margin: 24px auto;
 }
 
 .parameters-heading {
@@ -21,7 +31,7 @@
 .parameters-card {
   display: flex;
   align-items: center;
-  background: #4da8f7;
+  background: #31bce2;
   color: #fff;
   padding: 16px;
   border-radius: 12px;
@@ -49,7 +59,7 @@
 }
 .parameters-actions button {
   background: #fff;
-  color: #4da8f7;
+  color: #31bce2;
   border: none;
   padding: 8px 12px;
   border-radius: 8px;
@@ -61,7 +71,7 @@
 }
 .upload-label {
   background: #fff;
-  color: #4da8f7;
+  color: #31bce2;
   padding: 8px 12px;
   border-radius: 8px;
   cursor: pointer;
@@ -80,7 +90,7 @@
 
 .parameters-save {
   margin-top: 16px;
-  background: linear-gradient(to right, #4da8f7, #1a75d1);
+  background: linear-gradient(to right, #31bce2, #1a75d1);
   color: #fff;
   border: none;
   padding: 10px 24px;
@@ -111,12 +121,35 @@
   color: #666;
 }
 .parameters-success button {
-  background: linear-gradient(to right, #4da8f7, #1a75d1);
+  background: linear-gradient(to right, #31bce2, #1a75d1);
   color: #fff;
   border: none;
   padding: 10px 24px;
   border-radius: 8px;
   cursor: pointer;
+}
+
+.logout-button {
+  background-color: #dc3545 !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 20px !important;
+  border-radius: 5px !important;
+  cursor: pointer !important;
+  transition: background-color 0.3s ease !important;
+}
+
+.logout-button:hover {
+  background-color: #c82333 !important;
+}
+
+/* Footer */
+footer {
+  background-color: #f9f1f1;
+  text-align: center;
+  padding: 1rem;
+  width: 100%;
+  margin-top: auto; 
 }
 
 /* Responsive */

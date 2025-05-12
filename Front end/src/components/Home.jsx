@@ -24,6 +24,7 @@ export default function Home() {
         // Debug logs
         console.log('Token:', token);
         console.log('UserId:', userId);
+        console.log('UserId from localStorage:', userId);
         
         if (!token) {
           window.location.href = '/login';
@@ -40,16 +41,20 @@ export default function Home() {
         if (response.ok) {
           const users = await response.json();
           console.log('All users:', users);
+          console.log('Users array:', users);
+          console.log('Parsed UserId:', parseInt(userId, 10));
           
           const currentUser = users.find(user => {
-            console.log('Comparing:', user.id, parseInt(userId));
-            return user.id === parseInt(userId);
+            const parsedUserId = parseInt(userId, 10);
+            console.log('Comparing:', user.id, parsedUserId);
+            return user.id === parsedUserId;
           });
           
           console.log('Found user:', currentUser);
           
           if (currentUser) {
             setUserName(currentUser.username);
+            localStorage.setItem('userId', currentUser.id);
           } else {
             console.log('No matching user found');
             setUserName('User');

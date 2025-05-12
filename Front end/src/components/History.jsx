@@ -109,7 +109,7 @@ export default function History() {
               <span className="history-card-time">
                 {new Date(quiz.start_time).toLocaleTimeString()}
               </span>
-              <button className="history-view-results" onClick={() => navigate(`/quiz-results/${quiz.id}`)}>
+              <button className="history-view-results" onClick={() => navigate(`/quiz-statistics/${quiz.id}`)}>
                 View Results
               </button>
             </li>

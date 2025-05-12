@@ -6,8 +6,9 @@
   align-items: center;
   justify-content: space-between;
 
-  /* full-width gradient behind everything */
-  background: linear-gradient(to right, #4da8f7, #a3d9ff);
+  background: #31bce2; 
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
 
   padding: 0 20px;
   height: 60px;
@@ -17,7 +18,6 @@
   font-family: Arial, sans-serif;
 }
 
-/* logo now transparent so gradient shows through */
 .quizpi-navbar__logo {
   padding: 4px;
   display: flex;
@@ -39,7 +39,7 @@
   margin: 0 15px;
 }
 .quizpi-navbar__links a {
-  color: #fff;
+  color: #ffffff;
   text-decoration: none;
   font-weight: 500;
   letter-spacing: 0.5px;
@@ -76,4 +76,26 @@
   .quizpi-navbar__logo img { height: 30px; }
   .quizpi-navbar__links a { font-size: 14px; }
   .quizpi-navbar__avatar { width: 30px; height: 30px; }
+}
+
+.navbar {
+  background-color: #005aab;
+  color: white;
+  padding: 1rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.navbar a {
+  color: white;
+  text-decoration: none;
+  margin: 0 1rem;
+}
+
+.navbar a:hover {
+  text-decoration: underline;
 }

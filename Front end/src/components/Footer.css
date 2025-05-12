@@ -1,7 +1,11 @@
 .quizpi-footer {
-  background: linear-gradient(to bottom, #4da8f7, #005aab);
+  background: linear-gradient(to bottom, #31bce2, #005aab);
   color: white;
   padding: 40px 20px;
+  position: relative;
+  bottom: 0;
+  width: 100%;
+  margin-top: auto; /* Push the footer to the bottom */
 }
 
 .quizpi-footer__container {
