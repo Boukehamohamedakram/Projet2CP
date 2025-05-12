@@ -14,7 +14,7 @@ sudo cp ./config/nginx.conf /etc/nginx/sites-available/frontend
 sudo ln -s /etc/nginx/sites-available/frontend /etc/nginx/sites-enabled/
 
 # Copy the built React frontend to the appropriate directory
-sudo cp -r ./Front \end/build/* /var/www/frontend/
+sudo cp -r ./Front\ end/build/* /var/www/frontend/
 
 # Restart Nginx to apply changes
 sudo systemctl restart nginx
