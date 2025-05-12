@@ -1,0 +1,320 @@
+.programmed-main {
+  width: 100%;
+  max-width: 1400px;
+  margin: 24px auto;
+  padding: 2rem;
+  background-color: #ffffff;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 24px;
+  min-height: calc(100vh - 60px); /* Account for margins */
+}
+
+/* Page title */
+.programmed-title {
+  font-size: 2.5rem;
+  color: #0e87c1;
+  text-align: center;
+  margin-bottom: 2rem;
+  font-weight: bold;
+}
+
+/* Filter + Search Bar */
+.programmed-filter-search {
+  width: 90%;
+  margin: 0 auto 2rem auto;
+  display: flex;
+  justify-content: center;
+    border: #31bce2 1px solid;
+  padding: 0 12px;    
+  height: 40px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+}
+
+.ps-icon {
+  width: 20px;
+  height: 20px;
+}
+
+.ps-filter {
+  background: none;
+  border: none;
+  color: #31bce2;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  margin-right: 12px;
+}
+
+.ps-arrow {
+  margin-left: 4px;
+  font-size: 0.8rem;
+}
+
+.ps-input {
+  width: 100%;
+  max-width: 600px;
+  padding: 12px 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 25px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.ps-input:focus {
+  outline: none;
+  border-color: #31bce2;
+  box-shadow: 0 0 0 2px rgba(14, 135, 193, 0.1);
+}
+
+/* List of cards */
+.programmed-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  width: 100%;
+}
+
+.programmed-row {
+  display: flex;
+  justify-content: stretch;
+  width: 100%;
+}
+
+.programmed-card {
+  display: grid;
+  grid-template-columns: 40px minmax(200px, 2fr) minmax(150px, 1fr) minmax(100px, 1fr) minmax(100px, 1fr) 100px 100px;
+  align-items: center;
+  gap: 1rem;
+  padding: 1.25rem;
+  background: white;
+  border: 1.3px solid #31bce2;
+  border-color: #31bce2;
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1rem;
+  width: 90%; /* Reduce the width to make the cards smaller */
+  transition: all 0.2s ease;
+  margin-left: auto;
+  margin-right: auto;
+  display: flex;
+  justify-content: center;
+}
+
+.programmed-card:hover {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+  transform: translateY(-2px);
+}
+
+.card-icon {
+  width: 32px;
+  height: 32px;
+}
+
+.card-title {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.card-category {
+  background: #f5c518;
+  color: #333;
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.9rem;
+  margin: 0 auto;
+}
+
+select.card-category {
+  border: 1px solid #e0e0e0;
+  background: white;
+  cursor: pointer;
+  padding: 4px 24px 4px 8px;
+  appearance: none;
+    margin: 0 auto;
+
+}
+
+select.card-category:focus {
+  outline: none;
+  border-color: #4da8f7;
+  box-shadow: 0 0 0 2px rgba(77, 168, 247, 0.2);
+}
+
+.card-date,
+.card-time {
+  background: #4e4d4d;
+  color: white;
+  padding: 4px 8px;
+  border-radius: 12px;
+  white-space: nowrap;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  font-size: 0.9rem;
+    margin: 0 auto;
+  text-align: center; 
+  
+}
+
+/* Delete the combined datetime holder */
+.card-datetime {
+  display: none;
+}
+
+/* Modify Button */
+.card-modify {
+  background-color: #3ca0c8; /* Light blue */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-modify:hover {
+  background-color: #0474bc; /* Darker blue */
+  transform: scale(1.05);
+}
+
+/* Delete Button */
+.card-delete {
+  background-color: #e74c3c; /* Red */
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.card-delete:hover {
+  background-color: #c0392b; /* Darker red */
+  transform: scale(1.05);
+}
+
+/* Update media queries for better responsiveness */
+@media (max-width: 1200px) {
+  .programmed-card {
+    grid-template-columns: 40px minmax(150px, 1.5fr) minmax(120px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr) 90px 90px;
+    gap: 0.75rem;
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .programmed-main {
+    padding: 0 16px;
+  }
+
+  .programmed-filter-search {
+    max-width: 100%;
+  }
+
+  .programmed-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .programmed-card {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 16px;
+  }
+
+  .card-icon {
+    margin-bottom: 8px;
+  }
+
+  .card-title {
+    width: 100%;
+    margin-bottom: 8px;
+  }
+
+  .card-category,
+  .card-date,
+  .card-time {
+    width: auto;
+    margin: 4px 0;
+  }
+
+  .card-delete,
+  .card-modify {
+    width: 100%;
+    margin-top: 8px;
+  }
+}
+
+/* Mobile breakpoint */
+@media (max-width: 480px) {
+  .programmed-title {
+    font-size: 1.5rem;
+  }
+  .programmed-filter-search {
+    height: 32px;
+    padding: 0 8px;
+  }
+  .ps-icon {
+    width: 18px;
+    height: 18px;
+  }
+  .ps-filter {
+    font-size: 0.9rem;
+    margin-right: 8px;
+  }
+  .ps-input {
+    font-size: 0.9rem;
+  }
+  .card-icon {
+    width: 24px;
+    height: 24px;
+  }
+  .card-title {
+    font-size: 0.95rem;
+  }
+  .card-category,
+  .card-datetime {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+  .card-date,
+  .card-time {
+    font-size: 0.75rem;
+    padding: 4px 8px;
+  }
+}
+
+.no-quizzes-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+}
+
+.create-quiz-button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.2s;
+}
+
+.create-quiz-button:hover {
+  background-color: #0056b3;
+}
