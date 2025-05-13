@@ -3,8 +3,8 @@
 sudo apt update
 sudo apt install -y nginx hostapd dnsmasq
 
-sudo cp /home/pi/Projet2CP/app/app.apk /var/www/html/
-sudo cp /home/pi/Projet2CP/app/app.ipa /var/www/html/
+sudo cp /home/pi/Projet2CP/app/app-debug.apk /var/www/html/
+sudo cp "/home/pi/Projet2CP/app/FlutterIpaExport(1).ipa" /var/www/html/
 
 echo "<!DOCTYPE html>
 <html lang='en'>
