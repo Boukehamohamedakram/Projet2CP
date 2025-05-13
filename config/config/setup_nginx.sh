@@ -10,7 +10,7 @@ sudo cp ./config/nginx.conf /etc/nginx/sites-available/frontend
 
 sudo ln -s /etc/nginx/sites-available/frontend /etc/nginx/sites-enabled/
 
-sudo cp -r ./Front\ end/build/* /var/www/frontend/
+sudo cp -r ./node_modules/axios/dis/* /var/www/frontend/
 
 sudo systemctl restart nginx
 
